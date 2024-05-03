@@ -1,17 +1,27 @@
 #!/usr/bin/env python
-from queue import Queue
+import ROS_Node.ros_common as ros_common
+from PyQt5.QtCore import QMutex
 
-msg_queue = Queue()
-imu_queue = Queue()
+class CommonData(): # store the data from the ROS nodes
+    def __init__(self):
+        # global msg_queue
+        # msg_queue = Queue()
+        self.msg = ""
+        self.current_Time = ""
+        self.current_battery_status = ""
+        self.current_distance = ""
 
+        self.current_imu = ros_common.IMUinfo()
+        
+        self.lock = QMutex()
 
-def init():
-    global msg, current_Time, current_imu, current_battery_status, current_distance
-    # global msg_queue
-    # msg_queue = Queue()
-    msg = ""
-    current_Time = ""
-    current_imu = ""
-    current_battery_status = ""
-    current_distance = ""
+    def update_imu(self, ax, ay, az):
+        if not self.lock.tryLock():
+            print("Could not lock the mutex")
+            return
+        self.current_imu.ax = ax
+        self.current_imu.ay = ay
+        self.current_imu.az = az
+        self.lock.unlock()
+        return
 
