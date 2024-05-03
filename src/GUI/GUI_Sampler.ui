@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1288</width>
-    <height>953</height>
+    <width>1331</width>
+    <height>857</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -130,8 +130,8 @@
    <widget class="QLabel" name="AutonomousTitle">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>0</y>
+      <x>20</x>
+      <y>10</y>
       <width>391</width>
       <height>61</height>
      </rect>
@@ -150,8 +150,8 @@
    <widget class="QWidget" name="verticalLayoutWidget_2">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>100</y>
+      <x>20</x>
+      <y>80</y>
       <width>301</width>
       <height>181</height>
      </rect>
@@ -160,7 +160,10 @@
      <item>
       <widget class="QLabel" name="GPSLabel">
        <property name="text">
-        <string>GPS</string>
+        <string>Global Position</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignBottom|Qt::AlignHCenter</set>
        </property>
       </widget>
      </item>
@@ -183,7 +186,7 @@
        <item>
         <widget class="QLabel" name="AltLabel">
          <property name="text">
-          <string>Altitude</string>
+          <string>Altitude (MSL)</string>
          </property>
         </widget>
        </item>
@@ -207,8 +210,8 @@
    <widget class="QWidget" name="verticalLayoutWidget_3">
     <property name="geometry">
      <rect>
-      <x>410</x>
-      <y>10</y>
+      <x>670</x>
+      <y>80</y>
       <width>160</width>
       <height>80</height>
      </rect>
@@ -219,12 +222,15 @@
        <property name="text">
         <string>Battery Level</string>
        </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
       </widget>
      </item>
      <item>
       <widget class="QProgressBar" name="BatInd">
        <property name="value">
-        <number>24</number>
+        <number>100</number>
        </property>
       </widget>
      </item>
@@ -233,17 +239,20 @@
    <widget class="QWidget" name="verticalLayoutWidget_4">
     <property name="geometry">
      <rect>
-      <x>330</x>
-      <y>100</y>
-      <width>281</width>
-      <height>181</height>
+      <x>340</x>
+      <y>270</y>
+      <width>301</width>
+      <height>191</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="IMULayout">
      <item>
       <widget class="QLabel" name="IMULabel">
        <property name="text">
-        <string>IMU</string>
+        <string>IMU (Orientation °)</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignBottom|Qt::AlignHCenter</set>
        </property>
       </widget>
      </item>
@@ -252,28 +261,21 @@
        <item>
         <widget class="QLabel" name="XLabel0">
          <property name="text">
-          <string>X</string>
+          <string>Roll</string>
          </property>
         </widget>
        </item>
        <item>
         <widget class="QLabel" name="YLabel0">
          <property name="text">
-          <string>Y</string>
+          <string>Pitch</string>
          </property>
         </widget>
        </item>
        <item>
         <widget class="QLabel" name="ZLabel0">
          <property name="text">
-          <string>Z</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="WLabel0">
-         <property name="text">
-          <string>W</string>
+          <string>Yaw</string>
          </property>
         </widget>
        </item>
@@ -288,10 +290,11 @@
         <widget class="QLCDNumber" name="Y_DISP"/>
        </item>
        <item>
-        <widget class="QLCDNumber" name="Z_DISP"/>
-       </item>
-       <item>
-        <widget class="QLCDNumber" name="W_DISP"/>
+        <widget class="QLCDNumber" name="Z_DISP">
+         <property name="digitCount">
+          <number>6</number>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>
@@ -300,10 +303,10 @@
    <widget class="QWidget" name="verticalLayoutWidget_5">
     <property name="geometry">
      <rect>
-      <x>330</x>
-      <y>300</y>
-      <width>281</width>
-      <height>181</height>
+      <x>20</x>
+      <y>270</y>
+      <width>301</width>
+      <height>191</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="VelVLayout">
@@ -311,6 +314,9 @@
       <widget class="QLabel" name="VelLabel">
        <property name="text">
         <string>Velocity</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignBottom|Qt::AlignHCenter</set>
        </property>
       </widget>
      </item>
@@ -357,8 +363,8 @@
    <widget class="QWidget" name="verticalLayoutWidget_6">
     <property name="geometry">
      <rect>
-      <x>770</x>
-      <y>10</y>
+      <x>670</x>
+      <y>270</y>
       <width>160</width>
       <height>110</height>
      </rect>
@@ -404,8 +410,8 @@
    <widget class="QWidget" name="verticalLayoutWidget_7">
     <property name="geometry">
      <rect>
-      <x>590</x>
-      <y>10</y>
+      <x>670</x>
+      <y>180</y>
       <width>160</width>
       <height>80</height>
      </rect>
@@ -437,18 +443,18 @@
    <widget class="QTextBrowser" name="Logging">
     <property name="geometry">
      <rect>
-      <x>620</x>
-      <y>300</y>
-      <width>321</width>
-      <height>481</height>
+      <x>1010</x>
+      <y>80</y>
+      <width>311</width>
+      <height>721</height>
      </rect>
     </property>
    </widget>
    <widget class="QLabel" name="FlightLogTitle">
     <property name="geometry">
      <rect>
-      <x>740</x>
-      <y>250</y>
+      <x>1060</x>
+      <y>20</y>
       <width>241</width>
       <height>51</height>
      </rect>
@@ -463,14 +469,17 @@
     <property name="text">
      <string>Flight Log</string>
     </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+    </property>
    </widget>
    <widget class="QWidget" name="verticalLayoutWidget_15">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>300</y>
+      <x>20</x>
+      <y>570</y>
       <width>301</width>
-      <height>181</height>
+      <height>191</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="DesiredFlightLayout">
@@ -478,6 +487,9 @@
       <widget class="QLabel" name="DesiredFlightCoordinates">
        <property name="text">
         <string>Desired Flight Coordinates</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignBottom|Qt::AlignHCenter</set>
        </property>
       </widget>
      </item>
@@ -524,8 +536,8 @@
    <widget class="QPushButton" name="GetCurrentPositionUAV">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>490</y>
+      <x>20</x>
+      <y>770</y>
       <width>141</width>
       <height>31</height>
      </rect>
@@ -537,9 +549,9 @@
    <widget class="QPushButton" name="EmergencyStop">
     <property name="geometry">
      <rect>
-      <x>620</x>
-      <y>130</y>
-      <width>311</width>
+      <x>670</x>
+      <y>680</y>
+      <width>321</width>
       <height>121</height>
      </rect>
     </property>
@@ -550,8 +562,8 @@
    <widget class="QPushButton" name="SendPositionUAV">
     <property name="geometry">
      <rect>
-      <x>170</x>
-      <y>490</y>
+      <x>180</x>
+      <y>770</y>
       <width>141</width>
       <height>31</height>
      </rect>
@@ -563,8 +575,8 @@
    <widget class="QPushButton" name="GetCurrentPositionPayload">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>730</y>
+      <x>340</x>
+      <y>770</y>
       <width>141</width>
       <height>31</height>
      </rect>
@@ -576,8 +588,8 @@
    <widget class="QWidget" name="verticalLayoutWidget_16">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>530</y>
+      <x>340</x>
+      <y>570</y>
       <width>301</width>
       <height>191</height>
      </rect>
@@ -587,6 +599,9 @@
       <widget class="QLabel" name="DesiredWaterSamplingPayloadCoordinates">
        <property name="text">
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Desired Water Sampling &lt;/p&gt;&lt;p align=&quot;center&quot;&gt;Payload Coordinates&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignBottom|Qt::AlignHCenter</set>
        </property>
       </widget>
      </item>
@@ -633,8 +648,8 @@
    <widget class="QPushButton" name="SendPositionPayload">
     <property name="geometry">
      <rect>
-      <x>170</x>
-      <y>730</y>
+      <x>500</x>
+      <y>770</y>
       <width>141</width>
       <height>31</height>
      </rect>
@@ -646,14 +661,120 @@
    <widget class="QPushButton" name="SetHome">
     <property name="geometry">
      <rect>
-      <x>330</x>
-      <y>490</y>
+      <x>670</x>
+      <y>610</y>
       <width>101</width>
       <height>41</height>
      </rect>
     </property>
     <property name="text">
      <string>Set Home</string>
+    </property>
+   </widget>
+   <widget class="QWidget" name="verticalLayoutWidget_14">
+    <property name="geometry">
+     <rect>
+      <x>340</x>
+      <y>80</y>
+      <width>301</width>
+      <height>181</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="GPSDataLayout_3">
+     <item>
+      <widget class="QLabel" name="GPSLabel_2">
+       <property name="text">
+        <string>Relative Position</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="GPSHLayout_2">
+       <item>
+        <widget class="QLabel" name="LatLabel_2">
+         <property name="text">
+          <string>X</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="LongLabel_2">
+         <property name="text">
+          <string>Y</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="AltLabel_2">
+         <property name="text">
+          <string>Altitude (AGL)</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="GPS_DISP_2">
+       <item>
+        <widget class="QLCDNumber" name="RelX_DISP"/>
+       </item>
+       <item>
+        <widget class="QLCDNumber" name="RelY_DISP"/>
+       </item>
+       <item>
+        <widget class="QLCDNumber" name="AGL_DISP"/>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QPushButton" name="ARM">
+    <property name="geometry">
+     <rect>
+      <x>790</x>
+      <y>610</y>
+      <width>101</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Arm</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="DISARM">
+    <property name="geometry">
+     <rect>
+      <x>890</x>
+      <y>610</y>
+      <width>101</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Disarm</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="AutonomousTitle_2">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>480</y>
+      <width>281</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>30</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>Controls</string>
     </property>
    </widget>
   </widget>
