@@ -66,5 +66,6 @@ class CommonData(): # store the data from the ROS nodes
         self.lock.unlock()
         return
     
+    
 
 

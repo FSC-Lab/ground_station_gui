@@ -230,7 +230,10 @@
      <item>
       <widget class="QProgressBar" name="BatInd">
        <property name="value">
-        <number>100</number>
+        <number>20</number>
+       </property>
+       <property name="textVisible">
+        <bool>false</bool>
        </property>
       </widget>
      </item>

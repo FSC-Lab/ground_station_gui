@@ -2,7 +2,7 @@ import rospy
 from std_msgs.msg import String
 from PyQt5.QtCore import QObject, pyqtSignal, QThread, QMutex
 import Common
-from sensor_msgs.msg import Imu, NavSatFix
+from sensor_msgs.msg import Imu, NavSatFix, BatteryState
 from geometry_msgs.msg import PoseStamped, TwistStamped
 
 class TestNode(QObject):
@@ -20,6 +20,7 @@ class TestNode(QObject):
         self.pos_global_sub = rospy.Subscriber('mavros/global_position/global', NavSatFix, callback=self.pos_global_sub)
         self.pos_local_sub = rospy.Subscriber('mavros/local_position/pose', PoseStamped, callback=self.pos_local_sub)
         self.vel_sub = rospy.Subscriber('mavros/local_position/velocity_local', TwistStamped, callback=self.vel_sub)
+        self.bat_sub = rospy.Subscriber('mavros/battery', BatteryState, callback=self.bat_sub)
 
         # define publishers
         self.pub = rospy.Publisher('/GroundStationTransmit', String, queue_size=10)
@@ -46,6 +47,8 @@ class TestNode(QObject):
     def vel_sub(self, msg):
         self.data.update_vel(msg.twist.linear.x, msg.twist.linear.y, msg.twist.linear.z)
 
+    def bat_sub(self, msg):
+        self.data.current_battery_status = msg.percentage
 
     ### define gui input_signals ###
     def register_pub_task(self):
@@ -101,8 +104,10 @@ class RosThread:
         globalPosMsg = self.rosQtObject.data.current_global_pos
         localPosMsg = self.rosQtObject.data.current_local_pos
         velMsg = self.rosQtObject.data.current_vel
+
+        batMsg = self.rosQtObject.data.current_battery_status
         self.lock.unlock()
-        
+
         # accelerometer data
         self.ui.X_DISP.display("{:.2f}".format(imuMsg.roll, 2))
         self.ui.Y_DISP.display("{:.2f}".format(imuMsg.pitch, 2))
@@ -120,5 +125,13 @@ class RosThread:
         self.ui.U_Vel_DISP.display("{:.2f}".format(velMsg.vx, 2))
         self.ui.V_Vel_DISP.display("{:.2f}".format(velMsg.vy, 2))
         self.ui.W_Vel_DISP.display("{:.2f}".format(velMsg.vz, 2))
+
+        # misc data
+        
+        if batMsg: # takes long to initialize
+            ## if text message is set to visible
+            if self.ui.BatInd.isTextVisible() == False:
+                self.ui.BatInd.setTextVisible(True)
+            self.ui.BatInd.setValue(int(batMsg)*100)
 
     
