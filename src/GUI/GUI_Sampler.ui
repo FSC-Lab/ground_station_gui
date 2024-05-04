@@ -664,8 +664,8 @@
    <widget class="QPushButton" name="SetHome">
     <property name="geometry">
      <rect>
-      <x>670</x>
-      <y>610</y>
+      <x>890</x>
+      <y>620</y>
       <width>101</width>
       <height>41</height>
      </rect>
@@ -737,9 +737,9 @@
    <widget class="QPushButton" name="ARM">
     <property name="geometry">
      <rect>
-      <x>790</x>
-      <y>610</y>
-      <width>101</width>
+      <x>670</x>
+      <y>620</y>
+      <width>91</width>
       <height>41</height>
      </rect>
     </property>
@@ -750,9 +750,9 @@
    <widget class="QPushButton" name="DISARM">
     <property name="geometry">
      <rect>
-      <x>890</x>
-      <y>610</y>
-      <width>101</width>
+      <x>760</x>
+      <y>620</y>
+      <width>91</width>
       <height>41</height>
      </rect>
     </property>
@@ -778,6 +778,22 @@
     </property>
     <property name="text">
      <string>Controls</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="SimulationMode">
+    <property name="geometry">
+     <rect>
+      <x>670</x>
+      <y>590</y>
+      <width>161</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Simulation Mode</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
     </property>
    </widget>
   </widget>

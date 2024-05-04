@@ -1,9 +1,10 @@
 import rospy
-from std_msgs.msg import String
 from PyQt5.QtCore import QObject, pyqtSignal, QThread, QMutex
 import Common
 from sensor_msgs.msg import Imu, NavSatFix, BatteryState
 from geometry_msgs.msg import PoseStamped, TwistStamped
+from mavros_msgs.srv import CommandHome, CommandHomeRequest, CommandLong
+
 
 class TestNode(QObject):
     ## define signals
@@ -22,9 +23,10 @@ class TestNode(QObject):
         self.vel_sub = rospy.Subscriber('mavros/local_position/velocity_local', TwistStamped, callback=self.vel_sub)
         self.bat_sub = rospy.Subscriber('mavros/battery', BatteryState, callback=self.bat_sub)
 
-        # define publishers
-        self.pub = rospy.Publisher('/GroundStationTransmit', String, queue_size=10)
-        self.pubMsg.connect(self.publish_position)
+        # define publishers / services
+        self.set_home_service = rospy.ServiceProxy('mavros/cmd/set_home', CommandHome)
+        # arming
+        self.arming_service = rospy.ServiceProxy('mavros/cmd/command', CommandLong)
 
         # define services
         self.rate = rospy.Rate(10)
@@ -36,7 +38,7 @@ class TestNode(QObject):
     ### define callback functions from ros topics ###
     def imu_sub(self, msg): 
         # get orientation and convert to euler angles
-        self.data.update_imu(msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w)
+        self.data.update_imu(msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w) 
         
     def pos_global_sub(self, msg):
         self.data.update_global_pos(msg.latitude, msg.longitude, msg.altitude)
@@ -51,12 +53,18 @@ class TestNode(QObject):
         self.data.current_battery_status = msg.percentage
 
     ### define gui input_signals ###
-    def register_pub_task(self):
-        self.pubMsg.emit(0)
+    def send_set_home_request(self):
+        home_position = CommandHomeRequest()
+        home_position.latitude = self.data.current_global_pos.latitude
+        home_position.longitude = self.data.current_global_pos.longitude
+        home_position.altitude = self.data.current_global_pos.altitude
+        response = self.set_home_service(home_position)
+        print(response)
 
-    ### define publish functions to ros topics ###
-    def publish_position(self):
-        self.pub.publish('gui_test_msg')
+    ### define publish / service functions to ros topics ###
+    def send_arming_request(self, arm, param2):
+        response = self.arming_service(command=400, confirmation=0, param1 = arm, param2 = param2)
+        print(response)
     
     # main loop of ros node
     def run(self):
@@ -80,7 +88,6 @@ class RosThread:
 
         # move and start thread
         self.rosQtObject.moveToThread(self.thread)
-        
         self.lock = self.rosQtObject.data.lock
         self.thread.started.connect(self.rosQtObject.run)
 
@@ -93,12 +100,16 @@ class RosThread:
         self.rosQtObject.connectUpdateGUIData(self.UpdateGUIData)
 
         # callbacks from GUI
-        self.ui.SetHome.clicked.connect(self.rosQtObject.register_pub_task)
+        self.ui.SetHome.clicked.connect(self.rosQtObject.send_set_home_request)
+        self.ui.SimulationMode.stateChanged.connect(self.toggle_simulation_mode)
+        self.ui.ARM.clicked.connect(lambda: self.rosQtObject.send_arming_request(True, 0))
+        self.ui.DISARM.clicked.connect(lambda: self.rosQtObject.send_arming_request(False, 0))
+        self.ui.EmergencyStop.clicked.connect(lambda: self.rosQtObject.send_arming_request(False, 21196))
 
     # update GUI data
     def UpdateGUIData(self):
         if not self.lock.tryLock():
-            print("Could not lock the mut")
+            print("Could not lock the mutex")
             return
         imuMsg = self.rosQtObject.data.current_imu
         globalPosMsg = self.rosQtObject.data.current_global_pos
@@ -127,11 +138,20 @@ class RosThread:
         self.ui.W_Vel_DISP.display("{:.2f}".format(velMsg.vz, 2))
 
         # misc data
-        
         if batMsg: # takes long to initialize
-            ## if text message is set to visible
             if self.ui.BatInd.isTextVisible() == False:
                 self.ui.BatInd.setTextVisible(True)
             self.ui.BatInd.setValue(int(batMsg)*100)
 
+    ### callback functions for modifying GUI elements ###
+    def toggle_simulation_mode(self, state):
+        if state == 2:
+            print("Arming controls available")
+            self.ui.ARM.setEnabled(True)
+            self.ui.DISARM.setEnabled(True)
+        else:
+            print("Arming controls disabled")
+            self.ui.ARM.setEnabled(False)
+            self.ui.DISARM.setEnabled(False)
+        
     
