@@ -1,9 +1,10 @@
 import rospy
-from PyQt5.QtCore import QObject, pyqtSignal, QThread, QMutex
+from PyQt5.QtCore import QObject, pyqtSignal, QThread
 import Common
 from sensor_msgs.msg import Imu, NavSatFix, BatteryState
 from geometry_msgs.msg import PoseStamped, TwistStamped
 from mavros_msgs.srv import CommandHome, CommandHomeRequest, CommandLong
+from mavros_msgs.msg import State
 
 
 class TestNode(QObject):
@@ -22,13 +23,13 @@ class TestNode(QObject):
         self.pos_local_sub = rospy.Subscriber('mavros/local_position/pose', PoseStamped, callback=self.pos_local_sub)
         self.vel_sub = rospy.Subscriber('mavros/local_position/velocity_local', TwistStamped, callback=self.vel_sub)
         self.bat_sub = rospy.Subscriber('mavros/battery', BatteryState, callback=self.bat_sub)
+        self.status_sub = rospy.Subscriber('mavros/state', State, callback=self.status_sub)
 
         # define publishers / services
         self.set_home_service = rospy.ServiceProxy('mavros/cmd/set_home', CommandHome)
-        # arming
         self.arming_service = rospy.ServiceProxy('mavros/cmd/command', CommandLong)
 
-        # define services
+        # other
         self.rate = rospy.Rate(10)
         
     ### define signal connections to / from gui ###
@@ -51,6 +52,9 @@ class TestNode(QObject):
 
     def bat_sub(self, msg):
         self.data.current_battery_status = msg.percentage
+
+    def status_sub(self, msg):
+        self.data.update_state(msg.connected, msg.armed, msg.manual_input, msg.mode)
 
     ### define gui input_signals ###
     def send_set_home_request(self):
@@ -114,9 +118,12 @@ class RosThread:
         imuMsg = self.rosQtObject.data.current_imu
         globalPosMsg = self.rosQtObject.data.current_global_pos
         localPosMsg = self.rosQtObject.data.current_local_pos
+        totDist = self.rosQtObject.data.total_distance
+
         velMsg = self.rosQtObject.data.current_vel
 
         batMsg = self.rosQtObject.data.current_battery_status
+        stateMsg = self.rosQtObject.data.current_state
         self.lock.unlock()
 
         # accelerometer data
@@ -131,11 +138,19 @@ class RosThread:
         self.ui.RelX_DISP.display("{:.2f}".format(localPosMsg.x, 2))
         self.ui.RelY_DISP.display("{:.2f}".format(localPosMsg.y, 2))
         self.ui.AGL_DISP.display("{:.2f}".format(localPosMsg.z, 2))
+        self.ui.Meters_DISP.display("{:.2f}".format(totDist, 2))
 
         # velocity data
         self.ui.U_Vel_DISP.display("{:.2f}".format(velMsg.vx, 2))
         self.ui.V_Vel_DISP.display("{:.2f}".format(velMsg.vy, 2))
         self.ui.W_Vel_DISP.display("{:.2f}".format(velMsg.vz, 2))
+
+        # status updates
+        self.ui.StateARM.setText("Armed" if stateMsg.armed else "Disarmed")
+        self.ui.StateARM.setStyleSheet("color: red" if stateMsg.armed else "color: green")
+        self.ui.StateConnected.setText("Connected" if stateMsg.connected else "Disconnected")
+        self.ui.StateConnected.setStyleSheet("color: green" if stateMsg.connected else "color: red")
+        self.ui.StateMode.setText(stateMsg.mode)
 
         # misc data
         if batMsg: # takes long to initialize
