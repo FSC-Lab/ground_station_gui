@@ -46,16 +46,15 @@ class CommonData(): # store the data from the ROS nodes
         return
 
     def update_local_pos(self, x, y, z):
-        # update total distance (arc length of position curve) Not accurate and subject to drift
-        if self.current_local_pos.x != 0 and self.current_local_pos.y != 0:
-            self.total_distance += ((round(x - self.current_local_pos.x, 2))**2 + (round(y - self.current_local_pos.y, 2))**2)**0.5
-            # arc length = sqrt(dx^2 + dy^2)
-
         if not self.lock.tryLock():
             return
         self.current_local_pos.x = x
         self.current_local_pos.y = y
         self.current_local_pos.z = z
+        # update total distance (arc length of position curve) Not accurate and subject to drift
+        if self.current_local_pos.x != 0 and self.current_local_pos.y != 0:
+            self.total_distance += ((round(x - self.current_local_pos.x, 2))**2 + (round(y - self.current_local_pos.y, 2))**2)**0.5
+            # arc length = sqrt(dx^2 + dy^2)
         self.lock.unlock()
         return
     
