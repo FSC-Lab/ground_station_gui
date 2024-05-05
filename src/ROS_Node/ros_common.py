@@ -21,3 +21,10 @@ class VelocityInfo:
         self.vx = vx
         self.vy = vy
         self.vz = vz
+
+class StateInfo:
+    def __init__(self, connected=False, armed=False, manual_input=False, mode="") -> None:
+        self.connected = connected
+        self.armed = armed
+        self.manual_input = manual_input
+        self.mode = mode
