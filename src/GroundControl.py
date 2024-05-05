@@ -21,5 +21,5 @@ if __name__ == "__main__":
     # show the window
     WaterSamplingGroundControlStation.show()
     print("System Started")
-    sys.exit(app.exec_())
+    sys.exit(app.exec_()) 
 

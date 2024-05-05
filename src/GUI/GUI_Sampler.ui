@@ -132,7 +132,7 @@
      <rect>
       <x>20</x>
       <y>10</y>
-      <width>481</width>
+      <width>391</width>
       <height>61</height>
      </rect>
     </property>
@@ -430,14 +430,7 @@
      <item>
       <layout class="QHBoxLayout" name="FlightDistHLayout">
        <item>
-        <widget class="QLCDNumber" name="Meters_DISP">
-         <property name="smallDecimalPoint">
-          <bool>false</bool>
-         </property>
-         <property name="digitCount">
-          <number>6</number>
-         </property>
-        </widget>
+        <widget class="QLCDNumber" name="Meters_DISP"/>
        </item>
        <item>
         <widget class="QLabel" name="Meters_Label">
@@ -771,7 +764,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>500</y>
+      <y>480</y>
       <width>281</width>
       <height>61</height>
      </rect>
@@ -803,81 +796,6 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QLabel" name="StateARM">
-    <property name="geometry">
-     <rect>
-      <x>870</x>
-      <y>110</y>
-      <width>81</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">color : green</string>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::NoFrame</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Plain</enum>
-    </property>
-    <property name="text">
-     <string>DISARMED</string>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignCenter</set>
-    </property>
-   </widget>
-   <widget class="QLabel" name="StateConnected">
-    <property name="geometry">
-     <rect>
-      <x>860</x>
-      <y>90</y>
-      <width>111</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">color : red</string>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::NoFrame</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Plain</enum>
-    </property>
-    <property name="text">
-     <string>DISCONNECTED</string>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignCenter</set>
-    </property>
-   </widget>
-   <widget class="QLabel" name="StateMode">
-    <property name="geometry">
-     <rect>
-      <x>840</x>
-      <y>140</y>
-      <width>131</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true"/>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::NoFrame</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Plain</enum>
-    </property>
-    <property name="text">
-     <string>MODE</string>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignCenter</set>
-    </property>
-   </widget>
   </widget>
   <widget class="QWidget" name="ManualFlightManagment_Tab">
    <attribute name="title">
@@ -888,7 +806,7 @@
      <rect>
       <x>10</x>
       <y>0</y>
-      <width>321</width>
+      <width>271</width>
       <height>61</height>
      </rect>
     </property>
