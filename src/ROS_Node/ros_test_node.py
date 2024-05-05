@@ -145,12 +145,12 @@ class RosThread:
         self.ui.V_Vel_DISP.display("{:.2f}".format(velMsg.vy, 2))
         self.ui.W_Vel_DISP.display("{:.2f}".format(velMsg.vz, 2))
 
-        # status updates
+        # state updates
         self.ui.StateARM.setText("Armed" if stateMsg.armed else "Disarmed")
         self.ui.StateARM.setStyleSheet("color: red" if stateMsg.armed else "color: green")
         self.ui.StateConnected.setText("Connected" if stateMsg.connected else "Disconnected")
         self.ui.StateConnected.setStyleSheet("color: green" if stateMsg.connected else "color: red")
-        self.ui.StateMode.setText(stateMsg.mode)
+        self.ui.StateMode.setText(stateMsg.mode) 
 
         # misc data
         if batMsg: # takes long to initialize
