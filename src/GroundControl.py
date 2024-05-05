@@ -16,7 +16,7 @@ if __name__ == "__main__":
     ui = gui.Ui_WaterSamplingGroundControlStation()
     ui.setupUi(WaterSamplingGroundControlStation)
     # define the ros thread
-    rosThread = ros_node.RosThread(ui)
+    rosThread = ros_node.SingleDroneRosThread(ui)
     rosThread.start()
     # show the window
     WaterSamplingGroundControlStation.show()

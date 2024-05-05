@@ -7,7 +7,7 @@ from mavros_msgs.srv import CommandHome, CommandHomeRequest, CommandLong
 from mavros_msgs.msg import State
 
 
-class TestNode(QObject):
+class SingleDroneRosNode(QObject):
     ## define signals
     progress = pyqtSignal(int)
     pubMsg = pyqtSignal(int)
@@ -51,10 +51,9 @@ class TestNode(QObject):
         self.data.update_vel(msg.twist.linear.x, msg.twist.linear.y, msg.twist.linear.z)
 
     def bat_sub(self, msg):
-        self.data.current_battery_status = msg.percentage
-
+        self.data.update_bat(msg.percentage, msg.voltage)
     def status_sub(self, msg):
-        self.data.update_state(msg.connected, msg.armed, msg.manual_input, msg.mode)
+        self.data.update_state(msg.connected, msg.armed, msg.manual_input, msg.mode, msg.header.stamp.secs)
 
     ### define gui input_signals ###
     def send_set_home_request(self):
@@ -80,10 +79,10 @@ class TestNode(QObject):
                 print("ROS Shutdown Requested")
                 break
 
-class RosThread:
+class SingleDroneRosThread:
     def __init__(self, ui):
         super().__init__()
-        self.rosQtObject = TestNode()
+        self.rosQtObject = SingleDroneRosNode()
         self.thread = QThread()
 
         # setup signals
@@ -118,7 +117,6 @@ class RosThread:
         imuMsg = self.rosQtObject.data.current_imu
         globalPosMsg = self.rosQtObject.data.current_global_pos
         localPosMsg = self.rosQtObject.data.current_local_pos
-        totDist = self.rosQtObject.data.total_distance
 
         velMsg = self.rosQtObject.data.current_vel
 
@@ -138,7 +136,6 @@ class RosThread:
         self.ui.RelX_DISP.display("{:.2f}".format(localPosMsg.x, 2))
         self.ui.RelY_DISP.display("{:.2f}".format(localPosMsg.y, 2))
         self.ui.AGL_DISP.display("{:.2f}".format(localPosMsg.z, 2))
-        self.ui.Meters_DISP.display("{:.2f}".format(totDist, 2))
 
         # velocity data
         self.ui.U_Vel_DISP.display("{:.2f}".format(velMsg.vx, 2))
@@ -156,7 +153,24 @@ class RosThread:
         if batMsg: # takes long to initialize
             if self.ui.BatInd.isTextVisible() == False:
                 self.ui.BatInd.setTextVisible(True)
-            self.ui.BatInd.setValue(int(batMsg)*100)
+            self.ui.BatInd.setValue(float(batMsg.percentage)*100)
+            self.ui.VOLT_DISP.display("{:.2f}".format(batMsg.voltage, 2))
+
+        # update seconds
+        if not hasattr(self, 'seconds'):
+            self.armed_seconds = 0
+        if not hasattr(self, 'last_time'):
+            self.last_time = stateMsg.seconds
+        if stateMsg.armed:
+            self.armed_seconds = stateMsg.seconds - self.last_time # time since armed
+            self.ui.Sec_DISP.display("{}".format(self.armed_seconds, 1))
+        else:
+            self.last_time = stateMsg.seconds
+            self.armed_seconds = 0
+        # update minutes
+        if self.armed_seconds == 60:
+            self.ui.Min_DISP.display("{}".format(int(self.ui.Min_DISP.value() + 1), 1))
+            self.last_time = stateMsg.seconds
 
     ### callback functions for modifying GUI elements ###
     def toggle_simulation_mode(self, state):

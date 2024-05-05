@@ -22,9 +22,17 @@ class VelocityInfo:
         self.vy = vy
         self.vz = vz
 
+class BatteryInfo:
+    def __init__(self, percentage=0, voltage=0) -> None:
+        self.percentage = percentage
+        self.voltage = voltage
+
 class StateInfo:
-    def __init__(self, connected=False, armed=False, manual_input=False, mode="") -> None:
+    def __init__(self, connected=False, armed=False, manual_input=False, mode="", seconds=0) -> None:
         self.connected = connected
         self.armed = armed
         self.manual_input = manual_input
         self.mode = mode
+        self.seconds = seconds
+        self.total_seconds = 0
+        
