@@ -334,7 +334,7 @@
    <widget class="QWidget" name="verticalLayoutWidget_6">
     <property name="geometry">
      <rect>
-      <x>670</x>
+      <x>660</x>
       <y>170</y>
       <width>160</width>
       <height>110</height>
@@ -381,9 +381,9 @@
    <widget class="QTextBrowser" name="Logging">
     <property name="geometry">
      <rect>
-      <x>1010</x>
+      <x>1020</x>
       <y>80</y>
-      <width>311</width>
+      <width>301</width>
       <height>721</height>
      </rect>
     </property>
@@ -488,9 +488,9 @@
     <property name="geometry">
      <rect>
       <x>670</x>
-      <y>680</y>
+      <y>720</y>
       <width>321</width>
-      <height>121</height>
+      <height>81</height>
      </rect>
     </property>
     <property name="text">
@@ -596,19 +596,6 @@
      <string>Send pos. Payload</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="SetHome">
-    <property name="geometry">
-     <rect>
-      <x>890</x>
-      <y>620</y>
-      <width>101</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Set Home</string>
-    </property>
-   </widget>
    <widget class="QWidget" name="verticalLayoutWidget_14">
     <property name="geometry">
      <rect>
@@ -669,32 +656,6 @@
      </item>
     </layout>
    </widget>
-   <widget class="QPushButton" name="ARM">
-    <property name="geometry">
-     <rect>
-      <x>670</x>
-      <y>620</y>
-      <width>91</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Arm</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="DISARM">
-    <property name="geometry">
-     <rect>
-      <x>760</x>
-      <y>620</y>
-      <width>91</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Disarm</string>
-    </property>
-   </widget>
    <widget class="QLabel" name="AutonomousTitle_2">
     <property name="geometry">
      <rect>
@@ -715,26 +676,10 @@
      <string>Controls</string>
     </property>
    </widget>
-   <widget class="QCheckBox" name="SimulationMode">
-    <property name="geometry">
-     <rect>
-      <x>670</x>
-      <y>590</y>
-      <width>161</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Simulation Mode</string>
-    </property>
-    <property name="checked">
-     <bool>true</bool>
-    </property>
-   </widget>
    <widget class="QWidget" name="gridLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>670</x>
+      <x>660</x>
       <y>80</y>
       <width>161</width>
       <height>71</height>
@@ -830,6 +775,85 @@
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="gridLayoutWidget_2">
+    <property name="geometry">
+     <rect>
+      <x>670</x>
+      <y>570</y>
+      <width>321</width>
+      <height>141</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="gridLayout">
+     <property name="sizeConstraint">
+      <enum>QLayout::SetNoConstraint</enum>
+     </property>
+     <item row="3" column="0">
+      <widget class="QPushButton" name="Takeoff">
+       <property name="text">
+        <string>Takeoff</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QPushButton" name="DISARM">
+       <property name="text">
+        <string>Disarm</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QCheckBox" name="SimulationMode">
+       <property name="text">
+        <string>Simulation Mode</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QPushButton" name="ARM">
+       <property name="text">
+        <string>Arm</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLineEdit" name="TakeoffHeight">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>2.0</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QPushButton" name="SetHome">
+       <property name="text">
+        <string>Set Home</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0" colspan="2">
+      <widget class="QPushButton" name="Land">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Land</string>
        </property>
       </widget>
      </item>
