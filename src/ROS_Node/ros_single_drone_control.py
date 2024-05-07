@@ -3,14 +3,11 @@ from PyQt5.QtCore import QObject, pyqtSignal, QThread
 import Common
 from sensor_msgs.msg import Imu, NavSatFix, BatteryState
 from geometry_msgs.msg import PoseStamped, TwistStamped
-from mavros_msgs.srv import CommandHome, CommandHomeRequest, CommandLong, SetMode
+from mavros_msgs.srv import CommandHome, CommandHomeRequest, CommandLong, SetMode, CommandTOL
 from mavros_msgs.msg import State
-
 
 class SingleDroneRosNode(QObject):
     ## define signals
-    progress = pyqtSignal(int)
-    pubMsg = pyqtSignal(int)
     updateData = pyqtSignal(int)
     
     def __init__(self):
@@ -28,7 +25,8 @@ class SingleDroneRosNode(QObject):
         # define publishers / services
         self.set_home_service = rospy.ServiceProxy('mavros/cmd/set_home', CommandHome)
         self.arming_service = rospy.ServiceProxy('mavros/cmd/command', CommandLong)
-        self.local_pos_pub = rospy.Publisher('/mavros/setpoint_position/local', PoseStamped, queue_size=10)        
+        self.local_pos_pub = rospy.Publisher('/mavros/setpoint_position/local', PoseStamped, queue_size=10)
+        self.takeoff_service = rospy.ServiceProxy('mavros/cmd/takeoff', CommandTOL)        
         self.land_service = rospy.ServiceProxy('mavros/cmd/command', CommandLong)
         self.set_mode_service = rospy.ServiceProxy('mavros/set_mode', SetMode)
 
@@ -73,21 +71,17 @@ class SingleDroneRosNode(QObject):
         response = self.arming_service(command=400, confirmation=0, param1 = arm, param2 = param2)
         print(response)
 
-    def send_takeoff_request(self, altitude):
+    def send_takeoff_request(self, req_altitude):
         self.send_arming_request(True, 0)
-        self.send_position_request(0, 0, altitude)
- 
+        self.takeoff_service(
+            latitude = 0,
+            longitude = 0,
+            altitude = req_altitude,
+        )
+
     def send_land_request(self):
         response = self.land_service(command=21, confirmation=0, param1 = 0, param7 = 0)
         print(response)
-
-    def send_position_request(self, x, y, z):
-        msg = PoseStamped()
-        msg.header.stamp = rospy.Time.now()
-        msg.pose.position.x = float(x)
-        msg.pose.position.y = float(y)
-        msg.pose.position.z = float(z)
-        self.local_pos_pub.publish(msg)
     
     # main loop of ros node
     def run(self):
@@ -128,7 +122,7 @@ class SingleDroneRosThread:
         self.ui.ARM.clicked.connect(lambda: self.rosQtObject.send_arming_request(True, 0))
         self.ui.DISARM.clicked.connect(lambda: self.rosQtObject.send_arming_request(False, 0))
         self.ui.EmergencyStop.clicked.connect(lambda: self.rosQtObject.send_arming_request(False, 21196))
-        self.ui.Takeoff.clicked.connect(lambda: self.rosQtObject.send_takeoff_request(self.ui.TakeoffHeight.text()))
+        self.ui.Takeoff.clicked.connect(lambda: self.rosQtObject.send_takeoff_request(float(self.ui.TakeoffHeight.text())))
         self.ui.Land.clicked.connect(self.rosQtObject.send_land_request)
 
     # update GUI data
