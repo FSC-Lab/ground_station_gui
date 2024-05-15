@@ -9,6 +9,7 @@ from mavros_msgs.msg import State
 class SingleDroneRosNode(QObject):
     ## define signals
     updateData = pyqtSignal(int)
+    #pubGUIsig = pyqtSignal(GUIState)
     
     def __init__(self):
         super().__init__()
@@ -23,19 +24,37 @@ class SingleDroneRosNode(QObject):
         self.status_sub = rospy.Subscriber('mavros/state', State, callback=self.status_sub)
 
         # define publishers / services
-        self.set_home_service = rospy.ServiceProxy('mavros/cmd/set_home', CommandHome)
-        self.arming_service = rospy.ServiceProxy('mavros/cmd/command', CommandLong)
-        self.local_pos_pub = rospy.Publisher('/mavros/setpoint_position/local', PoseStamped, queue_size=10)
-        self.takeoff_service = rospy.ServiceProxy('mavros/cmd/takeoff', CommandTOL)        
-        self.land_service = rospy.ServiceProxy('mavros/cmd/command', CommandLong)
-        self.set_mode_service = rospy.ServiceProxy('mavros/set_mode', SetMode)
+        #self.gui_pub = rospy.Publisher('/GroundStationTransmit', GUIState, queue_size=10)
+
+        #self.set_home_service = rospy.ServiceProxy('mavros/cmd/set_home', CommandHome)
+        #self.arming_service = rospy.ServiceProxy('mavros/cmd/command', CommandLong)
+        #self.takeoff_service = rospy.ServiceProxy('mavros/cmd/takeoff', CommandTOL)        
+        #self.land_service = rospy.ServiceProxy('mavros/cmd/command', CommandLong)
+        #self.set_mode_service = rospy.ServiceProxy('mavros/set_mode', SetMode)
 
         # other
-        self.rate = rospy.Rate(10)
+        self.rate = rospy.Rate(5)
         
     ### define signal connections to / from gui ###
     def connectUpdateGUIData(self, callback):
         self.updateData.connect(callback)
+
+    def connectGUIPub(self, callback):
+        self.pubGUIsig.connect(callback)
+
+    def register_gui_pub(self):
+        self.pubGUIsig.emit(0)
+
+    # def publish_gui_state(self, armed=False, takeoff=False, land=False, altitude=False, e_stop=False):
+    #     ## make data a class
+    #     data = GUIState(
+    #         armed=armed,
+    #         takeoff=takeoff,
+    #         land=land,
+    #         altitude=altitude,
+    #         e_stop=e_stop
+    #     )
+    #     self.gui_pub.publish(data)
 
     ### define callback functions from ros topics ###
     def imu_sub(self, msg): 
@@ -58,31 +77,14 @@ class SingleDroneRosNode(QObject):
         self.data.update_state(msg.connected, msg.armed, msg.manual_input, msg.mode, msg.header.stamp.secs)
 
     ### define gui input_signals ###
-    def send_set_home_request(self):
-        home_position = CommandHomeRequest()
-        home_position.latitude = self.data.current_global_pos.latitude
-        home_position.longitude = self.data.current_global_pos.longitude
-        home_position.altitude = self.data.current_global_pos.altitude
-        response = self.set_home_service(home_position)
-        print(response)
+    # def send_set_home_request(self):
+    #     home_position = CommandHomeRequest()
+    #     home_position.latitude = self.data.current_global_pos.latitude
+    #     home_position.longitude = self.data.current_global_pos.longitude
+    #     home_position.altitude = self.data.current_global_pos.altitude
+    #     response = self.set_home_service(home_position)
+    #     print(response)
 
-    ### define publish / service functions to ros topics ###
-    def send_arming_request(self, arm, param2):
-        response = self.arming_service(command=400, confirmation=0, param1 = arm, param2 = param2)
-        print(response)
-
-    def send_takeoff_request(self, req_altitude):
-        self.send_arming_request(True, 0)
-        self.takeoff_service(
-            latitude = 0,
-            longitude = 0,
-            altitude = req_altitude,
-        )
-
-    def send_land_request(self):
-        response = self.land_service(command=21, confirmation=0, param1 = 0, param7 = 0)
-        print(response)
-    
     # main loop of ros node
     def run(self):
         while not rospy.is_shutdown():
@@ -115,15 +117,16 @@ class SingleDroneRosThread:
     def SetRosCallBack(self):
         # feedbacks from ros
         self.rosQtObject.connectUpdateGUIData(self.UpdateGUIData)
+        #self.rosQtObject.connectGUIPub(self.rosQtObject.publish_gui_state)
 
         # callbacks from GUI
-        self.ui.SetHome.clicked.connect(self.rosQtObject.send_set_home_request)
+        #self.ui.SetHome.clicked.connect(self.rosQtObject.send_set_home_request)
         self.ui.SimulationMode.stateChanged.connect(self.toggle_simulation_mode)
-        self.ui.ARM.clicked.connect(lambda: self.rosQtObject.send_arming_request(True, 0))
-        self.ui.DISARM.clicked.connect(lambda: self.rosQtObject.send_arming_request(False, 0))
-        self.ui.EmergencyStop.clicked.connect(lambda: self.rosQtObject.send_arming_request(False, 21196))
-        self.ui.Takeoff.clicked.connect(lambda: self.rosQtObject.send_takeoff_request(float(self.ui.TakeoffHeight.text())))
-        self.ui.Land.clicked.connect(self.rosQtObject.send_land_request)
+        # self.ui.ARM.clicked.connect(lambda: self.rosQtObject.publish_gui_state(armed=True))
+        # self.ui.DISARM.clicked.connect(lambda: self.rosQtObject.publish_gui_state(armed=False))
+        # self.ui.Takeoff.clicked.connect(lambda: self.rosQtObject.publish_gui_state(takeoff=True, altitude=float(self.ui.TakeoffHeight.text())))
+        # self.ui.Land.clicked.connect(lambda: self.rosQtObject.publish_gui_state(land=True))
+        # self.ui.EmergencyStop.clicked.connect(lambda: self.rosQtObject.publish_gui_state(e_stop=True))
 
     # update GUI data
     def UpdateGUIData(self):
@@ -133,7 +136,6 @@ class SingleDroneRosThread:
         imuMsg = self.rosQtObject.data.current_imu
         globalPosMsg = self.rosQtObject.data.current_global_pos
         localPosMsg = self.rosQtObject.data.current_local_pos
-
         velMsg = self.rosQtObject.data.current_vel
 
         batMsg = self.rosQtObject.data.current_battery_status
@@ -192,11 +194,42 @@ class SingleDroneRosThread:
     def toggle_simulation_mode(self, state):
         if state == 2:
             print("Arming controls available")
+            self.ui.StateSimulation.setText("INDOOR")
+            self.ui.StateSimulation.setStyleSheet("color: green")
             self.ui.ARM.setEnabled(True)
             self.ui.DISARM.setEnabled(True)
+            self.ui.Takeoff.setEnabled(True)
+            self.ui.Land.setEnabled(True)
+            self.ui.TakeoffHeight.setEnabled(True)
+            self.ui.EmergencyStop.setEnabled(True)
+
         else:
             print("Arming controls disabled")
+            self.ui.StateSimulation.setText("OUTDOOR")
+            self.ui.StateSimulation.setStyleSheet("color: red")
             self.ui.ARM.setEnabled(False)
             self.ui.DISARM.setEnabled(False)
+            self.ui.Takeoff.setEnabled(False)
+            self.ui.Land.setEnabled(False)
+            self.ui.TakeoffHeight.setEnabled(False)
+            self.ui.EmergencyStop.setEnabled(False)
         
-    
+        
+
+## ARCHIVED CODE ##
+### define publish / service functions to ros topics ###
+# def send_arming_request(self, arm, param2):
+#     response = self.arming_service(command=400, confirmation=0, param1 = arm, param2 = param2)
+#     print(response)
+
+# def send_takeoff_request(self, req_altitude):
+#     self.send_arming_request(True, 0)
+#     self.takeoff_service(
+#         latitude = 0,
+#         longitude = 0,
+#         altitude = req_altitude,
+#     )
+
+# def send_land_request(self):
+#     response = self.land_service(command=21, confirmation=0, param1 = 0, param7 = 0)
+#     print(response)

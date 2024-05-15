@@ -36,3 +36,13 @@ class StateInfo:
         self.seconds = seconds
         self.total_seconds = 0
         
+class GUIState:
+    def __init__(self, armed=False, takeoff=False, land=False, altitude=0, e_stop=False) -> None:
+        self.arm_pressed = armed
+        self.takeoff_pressed = takeoff
+        self.takeoff_altitude = altitude
+        self.land_pressed = land
+        self.e_stop_pressed = e_stop
+        
+
+

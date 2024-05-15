@@ -682,10 +682,20 @@
       <x>660</x>
       <y>80</y>
       <width>161</width>
-      <height>71</height>
+      <height>77</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="BatLayout">
+     <item row="1" column="0" colspan="2">
+      <widget class="QProgressBar" name="BatInd">
+       <property name="value">
+        <number>20</number>
+       </property>
+       <property name="textVisible">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
      <item row="0" column="0">
       <widget class="QLabel" name="Voltage_Label">
        <property name="text">
@@ -698,16 +708,6 @@
      </item>
      <item row="0" column="1">
       <widget class="QLCDNumber" name="VOLT_DISP"/>
-     </item>
-     <item row="1" column="0" colspan="2">
-      <widget class="QProgressBar" name="BatInd">
-       <property name="value">
-        <number>20</number>
-       </property>
-       <property name="textVisible">
-        <bool>false</bool>
-       </property>
-      </widget>
      </item>
     </layout>
    </widget>
@@ -810,7 +810,7 @@
      <item row="0" column="0">
       <widget class="QCheckBox" name="SimulationMode">
        <property name="text">
-        <string>Simulation Mode</string>
+        <string>Indoor Mode</string>
        </property>
        <property name="checked">
         <bool>true</bool>
@@ -858,6 +858,36 @@
       </widget>
      </item>
     </layout>
+   </widget>
+   <widget class="QLabel" name="StateSimulation">
+    <property name="geometry">
+     <rect>
+      <x>480</x>
+      <y>30</y>
+      <width>521</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: green</string>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::Box</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+    <property name="text">
+     <string>INDOOR</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
    </widget>
   </widget>
   <widget class="QWidget" name="ManualFlightManagment_Tab">
