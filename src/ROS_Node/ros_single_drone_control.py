@@ -5,6 +5,8 @@ from sensor_msgs.msg import Imu, NavSatFix, BatteryState
 from geometry_msgs.msg import PoseStamped, TwistStamped
 from mavros_msgs.srv import CommandHome, CommandHomeRequest, CommandLong, SetMode, CommandTOL
 from mavros_msgs.msg import State
+from trajectory_msgs.msg import JointTrajectoryPoint
+import numpy
 
 class SingleDroneRosNode(QObject):
     ## define signals
@@ -24,13 +26,12 @@ class SingleDroneRosNode(QObject):
         self.status_sub = rospy.Subscriber('mavros/state', State, callback=self.status_sub)
 
         # define publishers / services
-        #self.gui_pub = rospy.Publisher('/GroundStationTransmit', GUIState, queue_size=10)
+        self.coords_pub = rospy.Publisher('tracking_controller/target', JointTrajectoryPoint, queue_size=10)
+        self.set_home_service = rospy.ServiceProxy('mavros/cmd/set_home', CommandHome)
 
-        #self.set_home_service = rospy.ServiceProxy('mavros/cmd/set_home', CommandHome)
-        #self.arming_service = rospy.ServiceProxy('mavros/cmd/command', CommandLong)
-        #self.takeoff_service = rospy.ServiceProxy('mavros/cmd/takeoff', CommandTOL)        
-        #self.land_service = rospy.ServiceProxy('mavros/cmd/command', CommandLong)
-        #self.set_mode_service = rospy.ServiceProxy('mavros/set_mode', SetMode)
+        self.arming_service = rospy.ServiceProxy('mavros/cmd/command', CommandLong)
+        self.land_service = rospy.ServiceProxy('mavros/cmd/command', CommandLong)
+        self.set_mode_service = rospy.ServiceProxy('mavros/set_mode', SetMode)
 
         # other
         self.rate = rospy.Rate(5)
@@ -45,16 +46,12 @@ class SingleDroneRosNode(QObject):
     def register_gui_pub(self):
         self.pubGUIsig.emit(0)
 
-    # def publish_gui_state(self, armed=False, takeoff=False, land=False, altitude=False, e_stop=False):
-    #     ## make data a class
-    #     data = GUIState(
-    #         armed=armed,
-    #         takeoff=takeoff,
-    #         land=land,
-    #         altitude=altitude,
-    #         e_stop=e_stop
-    #     )
-    #     self.gui_pub.publish(data)
+    def publish_coordinates(self, x, y, z):
+        point = JointTrajectoryPoint()
+        point.positions = [x, y, z]
+        point.effort = [0, 0, 0]
+        point.time_from_start = rospy.Duration(0.1)
+        self.coords_pub.publish(point)
 
     ### define callback functions from ros topics ###
     def imu_sub(self, msg): 
@@ -75,15 +72,6 @@ class SingleDroneRosNode(QObject):
 
     def status_sub(self, msg):
         self.data.update_state(msg.connected, msg.armed, msg.manual_input, msg.mode, msg.header.stamp.secs)
-
-    ### define gui input_signals ###
-    # def send_set_home_request(self):
-    #     home_position = CommandHomeRequest()
-    #     home_position.latitude = self.data.current_global_pos.latitude
-    #     home_position.longitude = self.data.current_global_pos.longitude
-    #     home_position.altitude = self.data.current_global_pos.altitude
-    #     response = self.set_home_service(home_position)
-    #     print(response)
 
     # main loop of ros node
     def run(self):
@@ -120,13 +108,16 @@ class SingleDroneRosThread:
         #self.rosQtObject.connectGUIPub(self.rosQtObject.publish_gui_state)
 
         # callbacks from GUI
-        #self.ui.SetHome.clicked.connect(self.rosQtObject.send_set_home_request)
+        self.ui.SetHome.clicked.connect(self.send_set_home_request)
         self.ui.SimulationMode.stateChanged.connect(self.toggle_simulation_mode)
-        # self.ui.ARM.clicked.connect(lambda: self.rosQtObject.publish_gui_state(armed=True))
-        # self.ui.DISARM.clicked.connect(lambda: self.rosQtObject.publish_gui_state(armed=False))
-        # self.ui.Takeoff.clicked.connect(lambda: self.rosQtObject.publish_gui_state(takeoff=True, altitude=float(self.ui.TakeoffHeight.text())))
-        # self.ui.Land.clicked.connect(lambda: self.rosQtObject.publish_gui_state(land=True))
-        # self.ui.EmergencyStop.clicked.connect(lambda: self.rosQtObject.publish_gui_state(e_stop=True))
+        self.ui.SendPositionUAV.clicked.connect(self.send_coordinates)
+        self.ui.GetCurrentPositionUAV.clicked.connect(self.get_coordinates)
+
+        self.ui.ARM.clicked.connect(lambda: self.send_arming_request(True, 0))
+        self.ui.DISARM.clicked.connect(lambda: self.send_arming_request(False, 0))
+        self.ui.Takeoff.clicked.connect(lambda: self.send_takeoff_request(float(self.ui.TakeoffHeight.text())))
+        self.ui.Land.clicked.connect(lambda: self.send_land_request())
+        self.ui.EmergencyStop.clicked.connect(lambda: self.send_arming_request(False, 21196))
 
     # update GUI data
     def UpdateGUIData(self):
@@ -213,23 +204,61 @@ class SingleDroneRosThread:
             self.ui.Land.setEnabled(False)
             self.ui.TakeoffHeight.setEnabled(False)
             self.ui.EmergencyStop.setEnabled(False)
-        
-        
+    
+    def send_set_home_request(self):
+        home_position = CommandHomeRequest()
+        home_position.latitude = self.rosQtObject.data.current_global_pos.latitude
+        home_position.longitude = self.rosQtObject.data.current_global_pos.longitude
+        home_position.altitude = self.rosQtObject.data.current_global_pos.altitude
+        response = self.rosQtObject.set_home_service(home_position)
+        print(response)
 
-## ARCHIVED CODE ##
-### define publish / service functions to ros topics ###
-# def send_arming_request(self, arm, param2):
-#     response = self.arming_service(command=400, confirmation=0, param1 = arm, param2 = param2)
-#     print(response)
+    def send_coordinates(self):
+        # if text is '' then set to 0
+        if self.ui.XPositionUAV.text() == '':
+            x = 0
+        if self.ui.YPositionUAV.text() == '':
+            y = 0
+        if self.ui.ZPositionUAV.text() == '':
+            z = 0
+        else:
+            x = float(self.ui.XPositionUAV.text())
+            y = float(self.ui.YPositionUAV.text())
+            z = float(self.ui.ZPositionUAV.text())
 
-# def send_takeoff_request(self, req_altitude):
-#     self.send_arming_request(True, 0)
-#     self.takeoff_service(
-#         latitude = 0,
-#         longitude = 0,
-#         altitude = req_altitude,
-#     )
+        # clamp values to plus minus 5 meters from current position
 
-# def send_land_request(self):
-#     response = self.land_service(command=21, confirmation=0, param1 = 0, param7 = 0)
-#     print(response)
+        numpy.clip(x, -5, 5)
+        numpy.clip(y, -5, 5)
+        numpy.clip(z, 0, 5)
+
+        # if values are not within 5 meters of current position warn user
+        if abs(x) > 5 or abs(y) > 5 or abs(z) > 5:
+            print("Warning: Coordinates are more than 5 meters away from current position, clamping to 5 meters.")
+        if z < 0:
+            print("Warning: Z coordinate is negative, clamping to 0 meters.")
+
+        self.rosQtObject.publish_coordinates(x, y, z)
+
+    def get_coordinates(self):
+        self.ui.XPositionUAV.setText("{:.2f}".format(self.rosQtObject.data.current_local_pos.x, 2))
+        self.ui.YPositionUAV.setText("{:.2f}".format(self.rosQtObject.data.current_local_pos.y, 2))
+        self.ui.ZPositionUAV.setText("{:.2f}".format(self.rosQtObject.data.current_local_pos.z, 2))
+
+    ### define publish / service functions to ros topics ###
+    def send_arming_request(self, arm, param2):
+        response = self.rosQtObject.arming_service(command=400, confirmation=0, param1 = arm, param2 = param2)
+        print(response)
+        return response
+
+    def send_takeoff_request(self, req_altitude):
+        arm_response = self.send_arming_request(True, 0)
+        # if armed takeoff
+        if arm_response.result == 0:
+            self.rosQtObject.publish_coordinates(0, 0, req_altitude)
+            print(f"Takeoff request sent at {req_altitude} meters")
+
+    def send_land_request(self):
+        response = self.rosQtObject.land_service(command=21, confirmation=0, param1 = 0, param7 = 0)
+        self.rosQtObject.publish_coordinates(self.rosQtObject.data.current_local_pos.x, self.rosQtObject.data.current_local_pos.y, 0)
+        print(response)
