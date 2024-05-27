@@ -11,8 +11,7 @@ import numpy
 class SingleDroneRosNode(QObject):
     ## define signals
     updateData = pyqtSignal(int)
-    #pubGUIsig = pyqtSignal(GUIState)
-    
+
     def __init__(self):
         super().__init__()
         self.data = Common.CommonData()
@@ -118,6 +117,9 @@ class SingleDroneRosThread:
         self.ui.Takeoff.clicked.connect(lambda: self.send_takeoff_request(float(self.ui.TakeoffHeight.text())))
         self.ui.Land.clicked.connect(lambda: self.send_land_request())
         self.ui.EmergencyStop.clicked.connect(lambda: self.send_arming_request(False, 21196))
+
+        self.ui.OFFBOARD.clicked.connect(lambda: self.switch_mode("OFFBOARD"))
+        self.ui.POSCTL.clicked.connect(lambda: self.switch_mode("POSCTL"))
 
     # update GUI data
     def UpdateGUIData(self):
@@ -261,4 +263,8 @@ class SingleDroneRosThread:
     def send_land_request(self):
         response = self.rosQtObject.land_service(command=21, confirmation=0, param1 = 0, param7 = 0)
         self.rosQtObject.publish_coordinates(self.rosQtObject.data.current_local_pos.x, self.rosQtObject.data.current_local_pos.y, 0)
+        print(response)
+
+    def switch_mode(self, mode):
+        response = self.rosQtObject.set_mode_service(custom_mode=mode)
         print(response)

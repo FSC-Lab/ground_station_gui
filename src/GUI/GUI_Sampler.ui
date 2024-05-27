@@ -381,9 +381,9 @@
    <widget class="QTextBrowser" name="Logging">
     <property name="geometry">
      <rect>
-      <x>1020</x>
+      <x>1030</x>
       <y>80</y>
-      <width>301</width>
+      <width>291</width>
       <height>721</height>
      </rect>
     </property>
@@ -459,7 +459,11 @@
      <item>
       <layout class="QHBoxLayout" name="FlightHLayout1">
        <item>
-        <widget class="QLineEdit" name="XPositionUAV"/>
+        <widget class="QLineEdit" name="XPositionUAV">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QLineEdit" name="YPositionUAV"/>
@@ -888,6 +892,32 @@
     <property name="alignment">
      <set>Qt::AlignCenter</set>
     </property>
+   </widget>
+   <widget class="QWidget" name="verticalLayoutWidget_7">
+    <property name="geometry">
+     <rect>
+      <x>840</x>
+      <y>200</y>
+      <width>160</width>
+      <height>80</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <widget class="QPushButton" name="POSCTL">
+       <property name="text">
+        <string>POSCTL</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="OFFBOARD">
+       <property name="text">
+        <string>OFFBOARD</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
   </widget>
   <widget class="QWidget" name="ManualFlightManagment_Tab">
