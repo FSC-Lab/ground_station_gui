@@ -513,6 +513,9 @@
     <property name="text">
      <string>Send New Position</string>
     </property>
+    <property name="shortcut">
+     <string>Return</string>
+    </property>
    </widget>
    <widget class="QPushButton" name="GetCurrentPositionPayload">
     <property name="geometry">

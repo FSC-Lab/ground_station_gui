@@ -782,6 +782,7 @@ class Ui_WaterSamplingGroundControlStation(object):
         self.GetCurrentPositionUAV.setText(_translate("WaterSamplingGroundControlStation", "Get Current Position"))
         self.EmergencyStop.setText(_translate("WaterSamplingGroundControlStation", "Emergency Stop"))
         self.SendPositionUAV.setText(_translate("WaterSamplingGroundControlStation", "Send New Position"))
+        self.SendPositionUAV.setShortcut(_translate("WaterSamplingGroundControlStation", "Return"))
         self.GetCurrentPositionPayload.setText(_translate("WaterSamplingGroundControlStation", "Get  Pos. Payload"))
         self.DesiredWaterSamplingPayloadCoordinates.setText(_translate("WaterSamplingGroundControlStation", "<html><head/><body><p align=\"center\">Desired Water Sampling </p><p align=\"center\">Payload Coordinates</p></body></html>"))
         self.XLabel2.setText(_translate("WaterSamplingGroundControlStation", "X"))

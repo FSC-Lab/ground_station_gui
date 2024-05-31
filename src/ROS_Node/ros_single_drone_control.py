@@ -2,10 +2,11 @@ import rospy
 from PyQt5.QtCore import QObject, pyqtSignal, QThread
 import Common
 from sensor_msgs.msg import Imu, NavSatFix, BatteryState
-from geometry_msgs.msg import PoseStamped, TwistStamped
+from geometry_msgs.msg import PoseStamped, TwistStamped, Point
 from mavros_msgs.srv import CommandHome, CommandHomeRequest, CommandLong, SetMode, CommandTOL
 from mavros_msgs.msg import State
 from trajectory_msgs.msg import JointTrajectoryPoint
+from std_srvs.srv import Empty
 import numpy
 
 class SingleDroneRosNode(QObject):
@@ -19,15 +20,16 @@ class SingleDroneRosNode(QObject):
         # define subscribers
         self.imu_sub = rospy.Subscriber('mavros/imu/data', Imu, callback=self.imu_sub)
         self.pos_global_sub = rospy.Subscriber('mavros/global_position/global', NavSatFix, callback=self.pos_global_sub)
-        self.pos_local_sub = rospy.Subscriber('mavros/local_position/pose', PoseStamped, callback=self.pos_local_sub)
+        #self.pos_local_sub = rospy.Subscriber('mavros/local_position/pose', PoseStamped, callback=self.pos_local_sub)
+        self.pos_local_adjusted_sub = rospy.Subscriber('mavros/local_position/adjusted', PoseStamped, callback=self.pos_local_sub)
         self.vel_sub = rospy.Subscriber('mavros/local_position/velocity_local', TwistStamped, callback=self.vel_sub)
         self.bat_sub = rospy.Subscriber('mavros/battery', BatteryState, callback=self.bat_sub)
         self.status_sub = rospy.Subscriber('mavros/state', State, callback=self.status_sub)
 
         # define publishers / services
         self.coords_pub = rospy.Publisher('tracking_controller/target', JointTrajectoryPoint, queue_size=10)
-        self.set_home_service = rospy.ServiceProxy('mavros/cmd/set_home', CommandHome)
-
+        
+        self.set_home_service = rospy.ServiceProxy('mavros/override_set_home', Empty)
         self.arming_service = rospy.ServiceProxy('mavros/cmd/command', CommandLong)
         self.land_service = rospy.ServiceProxy('mavros/cmd/command', CommandLong)
         self.set_mode_service = rospy.ServiceProxy('mavros/set_mode', SetMode)
@@ -208,11 +210,7 @@ class SingleDroneRosThread:
             self.ui.EmergencyStop.setEnabled(False)
     
     def send_set_home_request(self):
-        home_position = CommandHomeRequest()
-        home_position.latitude = self.rosQtObject.data.current_global_pos.latitude
-        home_position.longitude = self.rosQtObject.data.current_global_pos.longitude
-        home_position.altitude = self.rosQtObject.data.current_global_pos.altitude
-        response = self.rosQtObject.set_home_service(home_position)
+        response = self.rosQtObject.set_home_service()
         print(response)
 
     def send_coordinates(self):
