@@ -29,7 +29,9 @@ class SingleDroneRosNode(QObject):
         # define publishers / services
         self.coords_pub = rospy.Publisher('tracking_controller/target', JointTrajectoryPoint, queue_size=10)
         
-        self.set_home_service = rospy.ServiceProxy('mavros/override_set_home', Empty)
+        self.set_home_override_service = rospy.ServiceProxy('mavros/override_set_home', Empty)
+        self.set_home_service = rospy.ServiceProxy('mavros/cmd/set_home', CommandHome)
+
         self.arming_service = rospy.ServiceProxy('mavros/cmd/command', CommandLong)
         self.land_service = rospy.ServiceProxy('mavros/cmd/command', CommandLong)
         self.set_mode_service = rospy.ServiceProxy('mavros/set_mode', SetMode)
@@ -210,7 +212,12 @@ class SingleDroneRosThread:
             self.ui.EmergencyStop.setEnabled(False)
     
     def send_set_home_request(self):
-        response = self.rosQtObject.set_home_service()
+        self.rosQtObject.set_home_override_service()
+        home_position = CommandHomeRequest()
+        home_position.latitude = self.rosQtObject.data.current_global_pos.latitude
+        home_position.longitude = self.rosQtObject.data.current_global_pos.longitude
+        home_position.altitude = self.rosQtObject.data.current_global_pos.latitude
+        response = self.rosQtObject.set_home_service(home_position)
         print(response)
 
     def send_coordinates(self):
