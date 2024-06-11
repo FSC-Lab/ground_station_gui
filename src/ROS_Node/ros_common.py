@@ -36,4 +36,9 @@ class StateInfo:
         self.seconds = seconds
         self.total_seconds = 0
 
-
+class AttitudeTarget:
+    def __init__(self, roll=0, pitch=0, yaw=0, thrust=0) -> None:
+        self.roll = roll
+        self.pitch = pitch
+        self.yaw = yaw
+        self.thrust = thrust

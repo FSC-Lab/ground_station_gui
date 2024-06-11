@@ -1,13 +1,15 @@
 import rospy
 from PyQt5.QtCore import QObject, pyqtSignal, QThread
+from PyQt5.QtWidgets import QMessageBox
 import Common
 from sensor_msgs.msg import Imu, NavSatFix, BatteryState
 from geometry_msgs.msg import PoseStamped, TwistStamped, Point
-from mavros_msgs.srv import CommandHome, CommandHomeRequest, CommandLong, SetMode, CommandTOL
-from mavros_msgs.msg import State
+from mavros_msgs.srv import CommandHome, CommandHomeRequest, CommandLong, SetMode
+from mavros_msgs.msg import State, AttitudeTarget
 from trajectory_msgs.msg import JointTrajectoryPoint
-from std_srvs.srv import Empty
-import numpy
+from std_srvs.srv import Empty, SetBool
+from nav_msgs.msg import Odometry
+import json
 
 class SingleDroneRosNode(QObject):
     ## define signals
@@ -22,15 +24,18 @@ class SingleDroneRosNode(QObject):
         self.pos_global_sub = rospy.Subscriber('mavros/global_position/global', NavSatFix, callback=self.pos_global_sub)
         #self.pos_local_sub = rospy.Subscriber('mavros/local_position/pose', PoseStamped, callback=self.pos_local_sub)
         self.pos_local_adjusted_sub = rospy.Subscriber('mavros/local_position/adjusted', PoseStamped, callback=self.pos_local_sub)
-        self.vel_sub = rospy.Subscriber('mavros/local_position/velocity_local', TwistStamped, callback=self.vel_sub)
+        self.vel_sub = rospy.Subscriber('mavros/local_position/odom/UAV0', Odometry, callback=self.vel_sub)
         self.bat_sub = rospy.Subscriber('mavros/battery', BatteryState, callback=self.bat_sub)
         self.status_sub = rospy.Subscriber('mavros/state', State, callback=self.status_sub)
 
+        self.commanded_attitude_sub = rospy.Subscriber('mavros/setpoint_raw/attitude', AttitudeTarget, callback=self.commanded_attitude_sub)
+
         # define publishers / services
         self.coords_pub = rospy.Publisher('tracking_controller/target', JointTrajectoryPoint, queue_size=10)
-        
+
         self.set_home_override_service = rospy.ServiceProxy('mavros/override_set_home', Empty)
         self.set_home_service = rospy.ServiceProxy('mavros/cmd/set_home', CommandHome)
+        self.estimator_type_service = rospy.ServiceProxy('estimator_type', SetBool)
 
         self.arming_service = rospy.ServiceProxy('mavros/cmd/command', CommandLong)
         self.land_service = rospy.ServiceProxy('mavros/cmd/command', CommandLong)
@@ -38,6 +43,12 @@ class SingleDroneRosNode(QObject):
 
         # other
         self.rate = rospy.Rate(5)
+
+        # read geofence from json file
+        with open('src/ROS_Node/geofence.json') as f:
+            geofence = json.load(f)
+            self.config = geofence
+            print("Geofence loaded: ", self.config)
         
     ### define signal connections to / from gui ###
     def connectUpdateGUIData(self, callback):
@@ -68,13 +79,16 @@ class SingleDroneRosNode(QObject):
         self.data.update_local_pos(msg.pose.position.x, msg.pose.position.y, msg.pose.position.z)
 
     def vel_sub(self, msg):
-        self.data.update_vel(msg.twist.linear.x, msg.twist.linear.y, msg.twist.linear.z)
+        self.data.update_vel(msg.twist.twist.linear.x, msg.twist.twist.linear.y, msg.twist.twist.linear.z)
 
     def bat_sub(self, msg):
         self.data.update_bat(msg.percentage, msg.voltage)
 
     def status_sub(self, msg):
         self.data.update_state(msg.connected, msg.armed, msg.manual_input, msg.mode, msg.header.stamp.secs)
+
+    def commanded_attitude_sub(self, msg):
+        self.data.update_attitude_target(msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w, msg.thrust)
 
     # main loop of ros node
     def run(self):
@@ -101,6 +115,11 @@ class SingleDroneRosThread:
         self.lock = self.rosQtObject.data.lock
         self.thread.started.connect(self.rosQtObject.run)
 
+        # set geofence
+        self.ui.Geofence_X.display(self.rosQtObject.config['x'])
+        self.ui.Geofence_Y.display(self.rosQtObject.config['y'])
+        self.ui.Geofence_Z.display(self.rosQtObject.config['z'])
+
     def start(self):
         self.thread.start()
 
@@ -113,6 +132,7 @@ class SingleDroneRosThread:
         # callbacks from GUI
         self.ui.SetHome.clicked.connect(self.send_set_home_request)
         self.ui.SimulationMode.stateChanged.connect(self.toggle_simulation_mode)
+        self.ui.UPDATEMODE.clicked.connect(self.update_mode)
         self.ui.SendPositionUAV.clicked.connect(self.send_coordinates)
         self.ui.GetCurrentPositionUAV.clicked.connect(self.get_coordinates)
 
@@ -124,6 +144,7 @@ class SingleDroneRosThread:
 
         self.ui.OFFBOARD.clicked.connect(lambda: self.switch_mode("OFFBOARD"))
         self.ui.POSCTL.clicked.connect(lambda: self.switch_mode("POSCTL"))
+        self.ui.HOLD.clicked.connect(self.hold)
 
     # update GUI data
     def UpdateGUIData(self):
@@ -137,12 +158,18 @@ class SingleDroneRosThread:
 
         batMsg = self.rosQtObject.data.current_battery_status
         stateMsg = self.rosQtObject.data.current_state
+        attitudeTarg = self.rosQtObject.data.current_attitude_target
         self.lock.unlock()
 
         # accelerometer data
         self.ui.X_DISP.display("{:.2f}".format(imuMsg.roll, 2))
         self.ui.Y_DISP.display("{:.2f}".format(imuMsg.pitch, 2))
         self.ui.Z_DISP.display("{:.2f}".format(imuMsg.yaw, 2))
+
+        self.ui.TargROLL_DISP.display("{:.2f}".format(attitudeTarg.roll, 2))
+        self.ui.TargPITCH_DISP.display("{:.2f}".format(attitudeTarg.pitch, 2))
+        self.ui.TargYAW_DISP.display("{:.2f}".format(attitudeTarg.yaw, 2))
+        self.ui.TargTHRUST_DISP.display("{:.2f}".format(attitudeTarg.thrust, 2))
 
         # global & local position data
         self.ui.LatGPS_DISP.display("{:.2f}".format(globalPosMsg.latitude, 2))
@@ -191,8 +218,6 @@ class SingleDroneRosThread:
     def toggle_simulation_mode(self, state):
         if state == 2:
             print("Arming controls available")
-            self.ui.StateSimulation.setText("INDOOR")
-            self.ui.StateSimulation.setStyleSheet("color: green")
             self.ui.ARM.setEnabled(True)
             self.ui.DISARM.setEnabled(True)
             self.ui.Takeoff.setEnabled(True)
@@ -202,8 +227,6 @@ class SingleDroneRosThread:
 
         else:
             print("Arming controls disabled")
-            self.ui.StateSimulation.setText("OUTDOOR")
-            self.ui.StateSimulation.setStyleSheet("color: red")
             self.ui.ARM.setEnabled(False)
             self.ui.DISARM.setEnabled(False)
             self.ui.Takeoff.setEnabled(False)
@@ -219,35 +242,46 @@ class SingleDroneRosThread:
         home_position.altitude = self.rosQtObject.data.current_global_pos.latitude
         response = self.rosQtObject.set_home_service(home_position)
         print(response)
+    
+    def update_mode(self):
+        res = self.rosQtObject.estimator_type_service(True)
+        if res.success:
+            self.ui.StateSimulation.setText("INDOOR")
+            self.ui.StateSimulation.setStyleSheet("color: green")
+        else:
+            self.ui.StateSimulation.setText("OUTDOOR")
+            self.ui.StateSimulation.setStyleSheet("color: red")
 
     def send_coordinates(self):
-        # if text is '' then set to 0
-        if self.ui.XPositionUAV.text() == '':
-            x = 0
-        if self.ui.YPositionUAV.text() == '':
-            y = 0
-        if self.ui.ZPositionUAV.text() == '':
-            z = 0
-        else:
+        # if text is inalid, warn user
+        try :
             x = float(self.ui.XPositionUAV.text())
             y = float(self.ui.YPositionUAV.text())
             z = float(self.ui.ZPositionUAV.text())
-
-        # clamp values to plus minus 5 meters from current position
-
-        numpy.clip(x, -5, 5)
-        numpy.clip(y, -5, 5)
-        numpy.clip(z, 0, 5)
-
+        except ValueError:
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Warning)
+            msg.setText("Invalid input, make sure values are numbers")
+            msg.setWindowTitle("Warning")
+            msg.setStandardButtons(QMessageBox.Ok)
+            msg.exec_()
+            return
+        
         # if values are not within 5 meters of current position warn user
-        if abs(x) > 5 or abs(y) > 5 or abs(z) > 5:
-            print("Warning: Coordinates are more than 5 meters away from current position, clamping to 5 meters.")
-        if z < 0:
-            print("Warning: Z coordinate is negative, clamping to 0 meters.")
+        if abs(x) > int(self.rosQtObject.config['x']) or abs(y) > int(self.rosQtObject.config['x']) or abs(z) > int(self.rosQtObject.config['x']) or z <= 0:
+            ## pop up dialog 
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Warning)
+            msg.setText("Position is not within 5 meters of current position")
+            msg.setWindowTitle("Warning")
+            msg.setStandardButtons(QMessageBox.Ok)
+            msg.exec_()
+            return
 
         self.rosQtObject.publish_coordinates(x, y, z)
 
     def get_coordinates(self):
+        # get current relative position
         self.ui.XPositionUAV.setText("{:.2f}".format(self.rosQtObject.data.current_local_pos.x, 2))
         self.ui.YPositionUAV.setText("{:.2f}".format(self.rosQtObject.data.current_local_pos.y, 2))
         self.ui.ZPositionUAV.setText("{:.2f}".format(self.rosQtObject.data.current_local_pos.z, 2))
@@ -273,3 +307,8 @@ class SingleDroneRosThread:
     def switch_mode(self, mode):
         response = self.rosQtObject.set_mode_service(custom_mode=mode)
         print(response)
+
+    def hold(self):
+        response = self.rosQtObject.publish_coordinates(self.rosQtObject.data.current_local_pos.x, self.rosQtObject.data.current_local_pos.y, 2)
+        print(response)
+

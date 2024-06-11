@@ -18,16 +18,12 @@ class CommonData(): # store the data from the ROS nodes
         self.current_vel = ros_common.VelocityInfo()
         self.current_battery_status = ros_common.BatteryInfo()
         self.current_state = ros_common.StateInfo()
+        self.current_attitude_target = ros_common.AttitudeTarget()
 
         self.lock = QMutex()
 
     def update_imu(self, x, y, z, w):
-        ## convert quaternion to euler angles
-        r = Rotation.from_quat([x, y, z, w])
-        euler = r.as_euler('xyz', degrees=True)
-        # convert to 360 coordinates
-
-        euler[2] = (90 - euler[2]) % 360
+        euler = self.quat_to_euler(x, y, z, w)
     
         if not self.lock.tryLock():
             return
@@ -83,6 +79,26 @@ class CommonData(): # store the data from the ROS nodes
         self.current_state.seconds = seconds
         self.lock.unlock()
         return
+    
+    def update_attitude_target(self, x, y, z, w, thrust):
+        euler = self.quat_to_euler(x, y, z, w)
+        if not self.lock.tryLock():
+            return
+        self.current_attitude_target.roll = euler[0]
+        self.current_attitude_target.pitch = euler[1]
+        self.current_attitude_target.yaw = euler[2]
+        self.current_attitude_target.thrust = thrust
+        self.lock.unlock()
+        return
+    
+    def quat_to_euler(self, x, y, z, w):
+        r = Rotation.from_quat([x, y, z, w])
+        euler = r.as_euler('xyz', degrees=True)
+
+        # convert to 360 coordinates
+        euler[2] = (90 - euler[2]) % 360
+
+        return euler
     
 
     
