@@ -22,5 +22,3 @@ if __name__ == "__main__":
     WaterSamplingGroundControlStation.show()
     print("System Started")
     sys.exit(app.exec_())
-
-2

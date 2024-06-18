@@ -60,10 +60,10 @@ class SingleDroneRosNode(QObject):
     def register_gui_pub(self):
         self.pubGUIsig.emit(0)
 
-    def publish_coordinates(self, x, y, z):
+    def publish_coordinates(self, x, y, z, yaw):
         point = JointTrajectoryPoint()
         point.positions = [x, y, z]
-        point.effort = [0, 0, 0]
+        point.effort = [yaw, 0, 0]
         point.time_from_start = rospy.Duration(0.1)
         self.coords_pub.publish(point)
 
@@ -258,6 +258,7 @@ class SingleDroneRosThread:
             x = float(self.ui.XPositionUAV.text())
             y = float(self.ui.YPositionUAV.text())
             z = float(self.ui.ZPositionUAV.text())
+            yaw = float(self.ui.YAWUAV.text())
         except ValueError:
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Warning)
@@ -278,13 +279,14 @@ class SingleDroneRosThread:
             msg.exec_()
             return
 
-        self.rosQtObject.publish_coordinates(x, y, z)
+        self.rosQtObject.publish_coordinates(x, y, z, yaw)
 
     def get_coordinates(self):
         # get current relative position
         self.ui.XPositionUAV.setText("{:.2f}".format(self.rosQtObject.data.current_local_pos.x, 2))
         self.ui.YPositionUAV.setText("{:.2f}".format(self.rosQtObject.data.current_local_pos.y, 2))
         self.ui.ZPositionUAV.setText("{:.2f}".format(self.rosQtObject.data.current_local_pos.z, 2))
+        self.ui.YAWUAV.setText("{:.2f}".format(self.rosQtObject.data.current_attitude_target.yaw, 2))
 
     ### define publish / service functions to ros topics ###
     def send_arming_request(self, arm, param2):
