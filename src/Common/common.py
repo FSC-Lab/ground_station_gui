@@ -96,7 +96,8 @@ class CommonData(): # store the data from the ROS nodes
         euler = r.as_euler('xyz', degrees=True)
 
         # convert to 360 coordinates
-        euler[2] = (90 - euler[2]) % 360
+        if euler[2] < 0:
+            euler[2] = euler[2] + 360
 
         return euler
     

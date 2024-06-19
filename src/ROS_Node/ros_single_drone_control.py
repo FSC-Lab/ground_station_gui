@@ -286,7 +286,7 @@ class SingleDroneRosThread:
         self.ui.XPositionUAV.setText("{:.2f}".format(self.rosQtObject.data.current_local_pos.x, 2))
         self.ui.YPositionUAV.setText("{:.2f}".format(self.rosQtObject.data.current_local_pos.y, 2))
         self.ui.ZPositionUAV.setText("{:.2f}".format(self.rosQtObject.data.current_local_pos.z, 2))
-        self.ui.YAWUAV.setText("{:.2f}".format(self.rosQtObject.data.current_attitude_target.yaw, 2))
+        self.ui.YAWUAV.setText("{:.2f}".format(self.rosQtObject.data.current_imu.yaw, 2))
 
     ### define publish / service functions to ros topics ###
     def send_arming_request(self, arm, param2):
