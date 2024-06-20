@@ -8,7 +8,7 @@ import ROS_Node as ros_node
 import GUI as gui
 
 if __name__ == "__main__":
-    # init ros
+    # init rosTrackingReference
     ros_node.rospy.init_node("GUI_Node_py")
     # define the window
     app = QtWidgets.QApplication(sys.argv)

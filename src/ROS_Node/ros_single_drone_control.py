@@ -10,6 +10,7 @@ from trajectory_msgs.msg import JointTrajectoryPoint
 from std_srvs.srv import Empty, SetBool
 from nav_msgs.msg import Odometry
 import json
+from tracking_control.msg import TrackingReference
 
 class SingleDroneRosNode(QObject):
     ## define signals
@@ -18,7 +19,6 @@ class SingleDroneRosNode(QObject):
     def __init__(self):
         super().__init__()
         self.data = Common.CommonData()
-
         # define subscribers
         self.imu_sub = rospy.Subscriber('mavros/imu/data', Imu, callback=self.imu_sub)
         self.pos_global_sub = rospy.Subscriber('mavros/global_position/global', NavSatFix, callback=self.pos_global_sub)
@@ -31,7 +31,7 @@ class SingleDroneRosNode(QObject):
         self.commanded_attitude_sub = rospy.Subscriber('mavros/setpoint_raw/attitude', AttitudeTarget, callback=self.commanded_attitude_sub)
 
         # define publishers / services
-        self.coords_pub = rospy.Publisher('tracking_controller/target', JointTrajectoryPoint, queue_size=10)
+        self.coords_pub = rospy.Publisher('tracking_controller/target', TrackingReference, queue_size=10)
 
         self.set_home_override_service = rospy.ServiceProxy('mavros/override_set_home', Empty)
         self.set_home_service = rospy.ServiceProxy('mavros/cmd/set_home', CommandHome)
@@ -61,10 +61,12 @@ class SingleDroneRosNode(QObject):
         self.pubGUIsig.emit(0)
 
     def publish_coordinates(self, x, y, z, yaw):
-        point = JointTrajectoryPoint()
-        point.positions = [x, y, z]
-        point.effort = [yaw, 0, 0]
-        point.time_from_start = rospy.Duration(0.1)
+        point = TrackingReference()
+        point.header.stamp = rospy.Time.now()
+        point.pose.position.x = x
+        point.pose.position.y = y
+        point.pose.position.z = z
+        point.yaw = yaw
         self.coords_pub.publish(point)
 
     ### define callback functions from ros topics ###
