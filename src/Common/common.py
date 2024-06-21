@@ -19,6 +19,7 @@ class CommonData(): # store the data from the ROS nodes
         self.current_battery_status = ros_common.BatteryInfo()
         self.current_state = ros_common.StateInfo()
         self.current_attitude_target = ros_common.AttitudeTarget()
+        self.indoor_mode = False
 
         self.lock = QMutex()
 
@@ -100,6 +101,14 @@ class CommonData(): # store the data from the ROS nodes
             euler[2] = euler[2] + 360
 
         return euler
+    
+    def update_estimator_type(self, indoor_mode):
+        if not self.lock.tryLock():
+            return
+        self.indoor_mode = indoor_mode
+        self.lock.unlock()
+        return
+        
     
 
     

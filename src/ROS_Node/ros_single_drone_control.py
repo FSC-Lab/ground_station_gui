@@ -7,10 +7,11 @@ from geometry_msgs.msg import PoseStamped, TwistStamped, Point
 from mavros_msgs.srv import CommandHome, CommandHomeRequest, CommandLong, SetMode
 from mavros_msgs.msg import State, AttitudeTarget
 from trajectory_msgs.msg import JointTrajectoryPoint
-from std_srvs.srv import Empty, SetBool
+from std_srvs.srv import Empty
 from nav_msgs.msg import Odometry
 import json
 from tracking_control.msg import TrackingReference
+from std_msgs.msg import Bool
 
 class SingleDroneRosNode(QObject):
     ## define signals
@@ -22,20 +23,20 @@ class SingleDroneRosNode(QObject):
         # define subscribers
         self.imu_sub = rospy.Subscriber('mavros/imu/data', Imu, callback=self.imu_sub)
         self.pos_global_sub = rospy.Subscriber('mavros/global_position/global', NavSatFix, callback=self.pos_global_sub)
-        #self.pos_local_sub = rospy.Subscriber('mavros/local_position/pose', PoseStamped, callback=self.pos_local_sub)
         self.pos_local_adjusted_sub = rospy.Subscriber('mavros/local_position/adjusted', PoseStamped, callback=self.pos_local_sub)
         self.vel_sub = rospy.Subscriber('mavros/local_position/odom/UAV0', Odometry, callback=self.vel_sub)
         self.bat_sub = rospy.Subscriber('mavros/battery', BatteryState, callback=self.bat_sub)
         self.status_sub = rospy.Subscriber('mavros/state', State, callback=self.status_sub)
-
         self.commanded_attitude_sub = rospy.Subscriber('mavros/setpoint_raw/attitude', AttitudeTarget, callback=self.commanded_attitude_sub)
+        self.estimator_type_sub = rospy.Subscriber('/estimator_type', Bool, callback=self.estimator_type_sub)
+
+    
 
         # define publishers / services
         self.coords_pub = rospy.Publisher('tracking_controller/target', TrackingReference, queue_size=10)
 
         self.set_home_override_service = rospy.ServiceProxy('mavros/override_set_home', Empty)
         self.set_home_service = rospy.ServiceProxy('mavros/cmd/set_home', CommandHome)
-        self.estimator_type_service = rospy.ServiceProxy('estimator_type', SetBool)
 
         self.arming_service = rospy.ServiceProxy('mavros/cmd/command', CommandLong)
         self.land_service = rospy.ServiceProxy('mavros/cmd/command', CommandLong)
@@ -92,6 +93,9 @@ class SingleDroneRosNode(QObject):
     def commanded_attitude_sub(self, msg):
         self.data.update_attitude_target(msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w, msg.thrust)
 
+    def estimator_type_sub(self, msg):
+        self.data.update_estimator_type(msg.data)
+
     # main loop of ros node
     def run(self):
         while not rospy.is_shutdown():
@@ -134,7 +138,6 @@ class SingleDroneRosThread:
         # callbacks from GUI
         self.ui.SetHome.clicked.connect(self.send_set_home_request)
         self.ui.SimulationMode.stateChanged.connect(self.toggle_simulation_mode)
-        self.ui.UPDATEMODE.clicked.connect(self.update_mode)
         self.ui.SendPositionUAV.clicked.connect(self.send_coordinates)
         self.ui.GetCurrentPositionUAV.clicked.connect(self.get_coordinates)
 
@@ -161,6 +164,7 @@ class SingleDroneRosThread:
         batMsg = self.rosQtObject.data.current_battery_status
         stateMsg = self.rosQtObject.data.current_state
         attitudeTarg = self.rosQtObject.data.current_attitude_target
+        indoor_mode = self.rosQtObject.data.indoor_mode
         self.lock.unlock()
 
         # accelerometer data
@@ -191,7 +195,16 @@ class SingleDroneRosThread:
         self.ui.StateARM.setStyleSheet("color: red" if stateMsg.armed else "color: green")
         self.ui.StateConnected.setText("Connected" if stateMsg.connected else "Disconnected")
         self.ui.StateConnected.setStyleSheet("color: green" if stateMsg.connected else "color: red")
-        self.ui.StateMode.setText(stateMsg.mode) 
+        self.ui.StateMode.setText(stateMsg.mode)
+
+        if indoor_mode:
+            self.ui.StateSimulation.setText("INDOOR")
+            self.ui.StateSimulation.setStyleSheet("color: green")
+            self.ui.SetHome.setEnabled(False)
+        else:
+            self.ui.StateSimulation.setText("OUTDOOR")
+            self.ui.StateSimulation.setStyleSheet("color: orange")
+            self.ui.SetHome.setEnabled(True)
 
         # misc data
         if batMsg: # takes long to initialize
@@ -219,22 +232,26 @@ class SingleDroneRosThread:
     ### callback functions for modifying GUI elements ###
     def toggle_simulation_mode(self, state):
         if state == 2:
-            print("Arming controls available")
+            print("Simulation controls available")
             self.ui.ARM.setEnabled(True)
             self.ui.DISARM.setEnabled(True)
             self.ui.Takeoff.setEnabled(True)
             self.ui.Land.setEnabled(True)
             self.ui.TakeoffHeight.setEnabled(True)
             self.ui.EmergencyStop.setEnabled(True)
+            self.ui.OFFBOARD.setEnabled(True)
+            self.ui.POSCTL.setEnabled(True)
 
         else:
-            print("Arming controls disabled")
+            print("Simulation controls disabled")
             self.ui.ARM.setEnabled(False)
             self.ui.DISARM.setEnabled(False)
             self.ui.Takeoff.setEnabled(False)
             self.ui.Land.setEnabled(False)
             self.ui.TakeoffHeight.setEnabled(False)
             self.ui.EmergencyStop.setEnabled(False)
+            self.ui.OFFBOARD.setEnabled(False)
+            self.ui.POSCTL.setEnabled(False)
     
     def send_set_home_request(self):
         self.rosQtObject.set_home_override_service()
@@ -244,15 +261,6 @@ class SingleDroneRosThread:
         home_position.altitude = self.rosQtObject.data.current_global_pos.latitude
         response = self.rosQtObject.set_home_service(home_position)
         print(response)
-    
-    def update_mode(self):
-        res = self.rosQtObject.estimator_type_service(True)
-        if res.success:
-            self.ui.StateSimulation.setText("INDOOR")
-            self.ui.StateSimulation.setStyleSheet("color: green")
-        else:
-            self.ui.StateSimulation.setText("OUTDOOR")
-            self.ui.StateSimulation.setStyleSheet("color: red")
 
     def send_coordinates(self):
         # if text is inalid, warn user
@@ -313,6 +321,6 @@ class SingleDroneRosThread:
         print(response)
 
     def hold(self):
-        response = self.rosQtObject.publish_coordinates(self.rosQtObject.data.current_local_pos.x, self.rosQtObject.data.current_local_pos.y, 2)
+        response = self.rosQtObject.publish_coordinates(self.rosQtObject.data.current_local_pos.x, self.rosQtObject.data.current_local_pos.y, 2, self.rosQtObject.data.current_imu.yaw)
         print(response)
 
