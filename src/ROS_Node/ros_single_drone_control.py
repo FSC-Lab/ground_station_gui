@@ -23,8 +23,8 @@ class SingleDroneRosNode(QObject):
         # define subscribers
         self.imu_sub = rospy.Subscriber('mavros/imu/data', Imu, callback=self.imu_sub)
         self.pos_global_sub = rospy.Subscriber('mavros/global_position/global', NavSatFix, callback=self.pos_global_sub)
-        self.pos_local_adjusted_sub = rospy.Subscriber('mavros/local_position/adjusted', PoseStamped, callback=self.pos_local_sub)
-        self.vel_sub = rospy.Subscriber('mavros/local_position/odom/UAV0', Odometry, callback=self.vel_sub)
+        self.pos_local_adjusted_sub = rospy.Subscriber('state_estimator/local_position/adjusted', PoseStamped, callback=self.pos_local_sub)
+        self.vel_sub = rospy.Subscriber('state_estimator/local_position/odom/UAV0', Odometry, callback=self.vel_sub)
         self.bat_sub = rospy.Subscriber('mavros/battery', BatteryState, callback=self.bat_sub)
         self.status_sub = rospy.Subscriber('mavros/state', State, callback=self.status_sub)
         self.commanded_attitude_sub = rospy.Subscriber('mavros/setpoint_raw/attitude', AttitudeTarget, callback=self.commanded_attitude_sub)
