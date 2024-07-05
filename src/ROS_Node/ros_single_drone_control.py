@@ -23,7 +23,7 @@ class SingleDroneRosNode(QObject):
         # define subscribers
         self.imu_sub = rospy.Subscriber('mavros/imu/data', Imu, callback=self.imu_sub)
         self.pos_global_sub = rospy.Subscriber('mavros/global_position/global', NavSatFix, callback=self.pos_global_sub)
-        self.pos_local_adjusted_sub = rospy.Subscriber('state_estimator/local_position/adjusted', PoseStamped, callback=self.pos_local_sub)
+        self.pos_local_adjusted_sub = rospy.Subscriber('state_estimator/local_position/odom_adjusted', Odometry, callback=self.pos_local_sub)
         self.vel_sub = rospy.Subscriber('state_estimator/local_position/odom/UAV0', Odometry, callback=self.vel_sub)
         self.bat_sub = rospy.Subscriber('mavros/battery', BatteryState, callback=self.bat_sub)
         self.status_sub = rospy.Subscriber('mavros/state', State, callback=self.status_sub)
@@ -33,7 +33,7 @@ class SingleDroneRosNode(QObject):
         # define publishers / services
         self.coords_pub = rospy.Publisher('tracking_controller/target', TrackingReference, queue_size=10)
 
-        self.set_home_override_service = rospy.ServiceProxy('mavros/override_set_home', Empty)
+        self.set_home_override_service = rospy.ServiceProxy('state_estimator/override_set_home', Empty)
         self.set_home_service = rospy.ServiceProxy('mavros/cmd/set_home', CommandHome)
 
         self.arming_service = rospy.ServiceProxy('mavros/cmd/command', CommandLong)
@@ -62,7 +62,7 @@ class SingleDroneRosNode(QObject):
         self.data_struct.update_global_pos(msg.latitude, msg.longitude, msg.altitude)
     
     def pos_local_sub(self, msg):
-        self.data_struct.update_local_pos(msg.pose.position.x, msg.pose.position.y, msg.pose.position.z)
+        self.data_struct.update_local_pos(msg.pose.pose.position.x, msg.pose.pose.position.y, msg.pose.pose.position.z)
 
     def vel_sub(self, msg):
         self.data_struct.update_vel(msg.twist.twist.linear.x, msg.twist.twist.linear.y, msg.twist.twist.linear.z)

@@ -15,6 +15,9 @@ class WaterSampleRosNode(QObject):
         self.encoder_raw_sub = rospy.Subscriber("/encoder/position_raw", Vector3Stamped, self.encoder_raw_callback)
         self.rate = rospy.Rate(5)
 
+        # define publishers
+        self.cmd_length_pub = rospy.Publisher("/encoder/setpoint_length", Vector3Stamped, queue_size=10)
+
     ### signal connections to GUI ###
     def connect_update_gui(self, callback):
         self.update_data.connect(callback)
@@ -67,6 +70,10 @@ class WaterSampleRosThread():
         self.ui.rawX_DISP.display(int(raw_pos_msg.x))
         self.ui.rawY_DISP.display(int(raw_pos_msg.y))
         self.ui.rawZ_DISP.display(int(raw_pos_msg.z))
+
+    def send_length_request(self):
+        length = self.ui.length_CMD.value()
+        self.ros_object.cmd_length_pub.publish(length_msg)
 
         
 
