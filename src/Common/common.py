@@ -14,12 +14,15 @@ class CommonData(): # store the data from the ROS nodes
 
         self.current_imu = ros_common.IMUinfo()
         self.current_global_pos = ros_common.GlobalPositionInfo()
-        self.current_local_pos = ros_common.LocalPositionInfo()
-        self.current_vel = ros_common.VelocityInfo()
+        self.current_local_pos = ros_common.Vector3()
+        self.current_vel = ros_common.Vector3()
         self.current_battery_status = ros_common.BatteryInfo()
         self.current_state = ros_common.StateInfo()
         self.current_attitude_target = ros_common.AttitudeTarget()
         self.indoor_mode = False
+
+        # water sampling
+        self.encoder_raw = ros_common.Vector3()
 
         self.lock = QMutex()
 
@@ -55,9 +58,9 @@ class CommonData(): # store the data from the ROS nodes
     def update_vel(self, vx, vy, vz):
         if not self.lock.tryLock():
             return
-        self.current_vel.vx = vx
-        self.current_vel.vy = vy
-        self.current_vel.vz = vz
+        self.current_vel.x = vx
+        self.current_vel.y = vy
+        self.current_vel.z = vz
         self.lock.unlock()
         return
     
@@ -106,6 +109,17 @@ class CommonData(): # store the data from the ROS nodes
         if not self.lock.tryLock():
             return
         self.indoor_mode = indoor_mode
+        self.lock.unlock()
+        return
+    
+    ## water sampling tab
+
+    def update_encoder_raw(self, x, y, z):
+        if not self.lock.tryLock():
+            return
+        self.encoder_raw.x = x
+        self.encoder_raw.y = y
+        self.encoder_raw.z = z
         self.lock.unlock()
         return
         

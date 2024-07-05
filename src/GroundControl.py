@@ -15,9 +15,11 @@ if __name__ == "__main__":
     WaterSamplingGroundControlStation = QtWidgets.QTabWidget()
     ui = gui.Ui_WaterSamplingGroundControlStation()
     ui.setupUi(WaterSamplingGroundControlStation)
-    # define the ros thread
-    rosThread = ros_node.SingleDroneRosThread(ui)
-    rosThread.start()
+    # define ros threads
+    rosSingleDroneThread = ros_node.SingleDroneRosThread(ui)
+    rosSingleDroneThread.start()
+    rosWaterSampleThread = ros_node.WaterSampleRosThread(ui)
+    rosWaterSampleThread.start()
     # show the window
     WaterSamplingGroundControlStation.show()
     print("System Started")
