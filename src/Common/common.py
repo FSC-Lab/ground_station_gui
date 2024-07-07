@@ -23,6 +23,7 @@ class CommonData(): # store the data from the ROS nodes
 
         # water sampling
         self.encoder_raw = ros_common.Vector3()
+        self.payload_pos = ros_common.Vector3()
 
         self.lock = QMutex()
 
@@ -120,6 +121,15 @@ class CommonData(): # store the data from the ROS nodes
         self.encoder_raw.x = x
         self.encoder_raw.y = y
         self.encoder_raw.z = z
+        self.lock.unlock()
+        return
+    
+    def update_payload_pos(self, x, y, z):
+        if not self.lock.tryLock():
+            return
+        self.payload_pos.x = x
+        self.payload_pos.y = y
+        self.payload_pos.z = z
         self.lock.unlock()
         return
         
