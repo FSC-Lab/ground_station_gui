@@ -3,15 +3,17 @@ from PyQt5.QtCore import QObject, pyqtSignal, QThread
 from PyQt5.QtWidgets import QMessageBox
 import Common
 from sensor_msgs.msg import Imu, NavSatFix, BatteryState
-from geometry_msgs.msg import PoseStamped, TwistStamped, Point
+from geometry_msgs.msg import PoseStamped, Point
 from mavros_msgs.srv import CommandHome, CommandHomeRequest, CommandLong, SetMode
 from mavros_msgs.msg import State, AttitudeTarget
+from nav_msgs.msg import Path
+from visualization_msgs.msg import Marker
 from trajectory_msgs.msg import JointTrajectoryPoint
 from std_srvs.srv import Empty
 from nav_msgs.msg import Odometry
 import json
 from tracking_control.msg import TrackingReference
-from std_msgs.msg import Bool
+from std_msgs.msg import Bool, Header
 
 class SingleDroneRosNode(QObject):
     ## define signals
@@ -32,6 +34,7 @@ class SingleDroneRosNode(QObject):
 
         # define publishers / services
         self.coords_pub = rospy.Publisher('tracking_controller/target', TrackingReference, queue_size=10)
+        self.geofence_pub = rospy.Publisher('tracking_controller/geofence', Marker, queue_size=1)
 
         self.set_home_override_service = rospy.ServiceProxy('state_estimator/override_set_home', Empty)
         self.set_home_service = rospy.ServiceProxy('mavros/cmd/set_home', CommandHome)
@@ -46,8 +49,10 @@ class SingleDroneRosNode(QObject):
         # read geofence from json file
         with open('src/ROS_Node/geofence.json') as f:
             geofence = json.load(f)
-            self.config = geofence
-            print("Geofence loaded: ", self.config)
+            self.config = [0, 0, 0]
+            self.config[0] = geofence['x']
+            self.config[1] = geofence['y']
+            self.config[2] = geofence['z']
         
     ### define signal connections to / from gui ###
     def connect_update_gui(self, callback):
@@ -89,6 +94,40 @@ class SingleDroneRosNode(QObject):
         point.yaw = yaw
         self.coords_pub.publish(point)
 
+    def publish_geofence(self, x, y, z):
+        marker = Marker()
+        marker.header.frame_id = "map"
+        marker.header.stamp = rospy.Time.now()
+        marker.ns = "geofence"
+        marker.id = 0
+        marker.type = Marker.LINE_LIST
+        marker.action = Marker.ADD
+
+        marker.scale.x = 0.01
+        marker.color.a = 1.0
+        marker.color.r = 0.0
+        marker.color.g = 1.0
+        marker.color.b = 0.0
+
+        corners = [(x, y, 0), (x, -y, 0),  (-x, -y, 0),  (-x, y, 0), (x, y, z), (x, -y, z),(-x, -y, z), (-x, y, z)]
+        edges = [
+            (corners[0], corners[1]), (corners[1], corners[2]), (corners[2], corners[3]), (corners[3], corners[0]),  # Bottom face
+            (corners[4], corners[5]), (corners[5], corners[6]), (corners[6], corners[7]), (corners[7], corners[4]),  # Top face
+            (corners[0], corners[4]), (corners[1], corners[5]), (corners[2], corners[6]), (corners[3], corners[7])   # Vertical edges
+        ]
+
+        # create points for each edge
+        for edge in edges:
+            start, end = edge   # define edge
+            point_start = Point()
+            point_start.x, point_start.y, point_start.z = start # start points
+            point_end = Point()
+            point_end.x, point_end.y, point_end.z = end         # end points
+            marker.points.append(point_start)
+            marker.points.append(point_end)
+
+        print("Geofence published")
+        self.geofence_pub.publish(marker)
 
     # main loop of ros node
     def run(self):
@@ -116,9 +155,15 @@ class SingleDroneRosThread:
         self.thread.started.connect(self.ros_object.run)
 
         # set geofence
-        self.ui.Geofence_X.display(self.ros_object.config['x'])
-        self.ui.Geofence_Y.display(self.ros_object.config['y'])
-        self.ui.Geofence_Z.display(self.ros_object.config['z'])
+        self.ui.Geofence_X.display(self.ros_object.config[0])
+        self.ui.Geofence_Y.display(self.ros_object.config[1])
+        self.ui.Geofence_Z.display(self.ros_object.config[2])
+        while self.ros_object.geofence_pub.get_num_connections() < 1:
+            rate = rospy.Rate(1)
+            print("Waiting for Rviz to connect to geofence publisher")
+            rate.sleep()
+        self.ros_object.publish_geofence(int(self.ros_object.config[0]), int(self.ros_object.config[1]), int(self.ros_object.config[2]))
+
 
     def start(self):
         self.thread.start()
@@ -221,6 +266,7 @@ class SingleDroneRosThread:
         if self.armed_seconds == 60:
             self.ui.Min_DISP.display("{}".format(int(self.ui.Min_DISP.value() + 1), 1))
             self.last_time = state_msg.seconds
+        
 
     ### callback functions for modifying GUI elements ###
     def toggle_simulation_mode(self, state):
@@ -272,7 +318,7 @@ class SingleDroneRosThread:
             return
         
         # if values are not within 5 meters of current position warn user
-        if abs(x) > int(self.ros_object.config['x']) or abs(y) > int(self.ros_object.config['x']) or abs(z) > int(self.ros_object.config['x']) or z <= 0:
+        if abs(x) > int(self.ros_object.config[0]) or abs(y) > int(self.ros_object.config[1]) or abs(z) > int(self.ros_object.config[2]) or z <= 0:
             ## pop up dialog 
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Warning)
