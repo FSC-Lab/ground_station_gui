@@ -3,17 +3,15 @@ from PyQt5.QtCore import QObject, pyqtSignal, QThread
 from PyQt5.QtWidgets import QMessageBox
 import Common
 from sensor_msgs.msg import Imu, NavSatFix, BatteryState
-from geometry_msgs.msg import PoseStamped, Point
+from geometry_msgs.msg import Point
 from mavros_msgs.srv import CommandHome, CommandHomeRequest, CommandLong, SetMode
 from mavros_msgs.msg import State, AttitudeTarget
-from nav_msgs.msg import Path
 from visualization_msgs.msg import Marker
-from trajectory_msgs.msg import JointTrajectoryPoint
 from std_srvs.srv import Empty
 from nav_msgs.msg import Odometry
 import json
 from tracking_control.msg import TrackingReference
-from std_msgs.msg import Bool, Header
+from std_msgs.msg import Bool
 
 class SingleDroneRosNode(QObject):
     ## define signals
