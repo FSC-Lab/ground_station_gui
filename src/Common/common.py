@@ -97,7 +97,9 @@ class CommonData(): # store the data from the ROS nodes
         return
     
     def quat_to_euler(self, x, y, z, w):
-        r = Rotation.from_quat([x, y, z, w])
+        nrm = abs(sum(it**2 for it in (x, y, z, w)) - 1.0)
+        quat = [0, 0, 0, 1] if nrm > 1e-5 else [x, y, z, w]
+        r = Rotation.from_quat(quat)
         euler = r.as_euler('xyz', degrees=True)
 
         # convert to 360 coordinates

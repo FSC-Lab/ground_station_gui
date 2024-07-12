@@ -10,7 +10,7 @@ from visualization_msgs.msg import Marker
 from std_srvs.srv import Empty
 from nav_msgs.msg import Odometry
 import json
-from tracking_control.msg import TrackingReference
+from fsc_autopilot_ros.msg import TrackingReference
 from std_msgs.msg import Bool
 
 class SingleDroneRosNode(QObject):
@@ -23,7 +23,7 @@ class SingleDroneRosNode(QObject):
         # define subscribers
         self.imu_sub = rospy.Subscriber('mavros/imu/data', Imu, callback=self.imu_sub)
         self.pos_global_sub = rospy.Subscriber('mavros/global_position/global', NavSatFix, callback=self.pos_global_sub)
-        self.pos_local_adjusted_sub = rospy.Subscriber('state_estimator/local_position/odom_adjusted', Odometry, callback=self.pos_local_sub)
+        self.pos_local_adjusted_sub = rospy.Subscriber('state_estimator/local_position/odom/UAV0', Odometry, callback=self.pos_local_sub)
         self.vel_sub = rospy.Subscriber('state_estimator/local_position/odom/UAV0', Odometry, callback=self.vel_sub)
         self.bat_sub = rospy.Subscriber('mavros/battery', BatteryState, callback=self.bat_sub)
         self.status_sub = rospy.Subscriber('mavros/state', State, callback=self.status_sub)
@@ -31,7 +31,7 @@ class SingleDroneRosNode(QObject):
         self.estimator_type_sub = rospy.Subscriber('/estimator_type', Bool, callback=self.estimator_type_sub)
 
         # define publishers / services
-        self.coords_pub = rospy.Publisher('tracking_controller/target', TrackingReference, queue_size=10)
+        self.coords_pub = rospy.Publisher('position_controller/target', TrackingReference, queue_size=10)
         self.geofence_pub = rospy.Publisher('tracking_controller/geofence', Marker, queue_size=1)
 
         self.set_home_override_service = rospy.ServiceProxy('state_estimator/override_set_home', Empty)
