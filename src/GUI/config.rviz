@@ -6,8 +6,8 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
-        - /Marker1/Status1
         - /Odometry1
+        - /Odometry1/Status1
       Splitter Ratio: 0.5
     Tree Height: 708
   - Class: rviz/Selection
@@ -93,7 +93,7 @@ Visualization Manager:
         Shaft Length: 1
         Shaft Radius: 0.05000000074505806
         Value: Axes
-      Topic: /state_estimator/local_position/odom_adjusted
+      Topic: /state_estimator/local_position/odom/UAV0
       Unreliable: false
       Value: true
   Enabled: true
@@ -140,9 +140,9 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.0203977823257446
+      Pitch: 0.3397965431213379
       Target Frame: <Fixed Frame>
-      Yaw: 4.253582954406738
+      Yaw: 3.9485836029052734
     Saved: ~
 Window Geometry:
   Displays:
@@ -160,5 +160,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1908
-  X: 0
-  Y: 0
+  X: -32
+  Y: -32

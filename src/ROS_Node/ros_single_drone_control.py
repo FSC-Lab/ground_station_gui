@@ -31,7 +31,7 @@ class SingleDroneRosNode(QObject):
         self.estimator_type_sub = rospy.Subscriber('/estimator_type', Bool, callback=self.estimator_type_sub)
 
         # define publishers / services
-        self.coords_pub = rospy.Publisher('position_controller/target', TrackingReference, queue_size=10)
+        self.coords_pub = rospy.Publisher('position_controller/target', TrackingReference, queue_size=1)
         self.geofence_pub = rospy.Publisher('tracking_controller/geofence', Marker, queue_size=1)
 
         self.set_home_override_service = rospy.ServiceProxy('state_estimator/override_set_home', Empty)
@@ -90,6 +90,7 @@ class SingleDroneRosNode(QObject):
         point.pose.position.y = y
         point.pose.position.z = z
         point.yaw = yaw
+        print(f"Publishing coordinates: {x}, {y}, {z}, {yaw}")
         self.coords_pub.publish(point)
 
     def publish_geofence(self, x, y, z):
