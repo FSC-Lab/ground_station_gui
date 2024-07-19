@@ -1173,8 +1173,8 @@
    <widget class="QLabel" name="titleControls">
     <property name="geometry">
      <rect>
-      <x>530</x>
-      <y>500</y>
+      <x>-10</x>
+      <y>520</y>
       <width>281</width>
       <height>61</height>
      </rect>
@@ -1196,27 +1196,27 @@
    <widget class="QPushButton" name="btnGetCurLenght">
     <property name="geometry">
      <rect>
-      <x>230</x>
-      <y>720</y>
+      <x>30</x>
+      <y>750</y>
       <width>201</width>
       <height>31</height>
      </rect>
     </property>
     <property name="text">
-     <string>Get Current Length</string>
+     <string>Get Current</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="btnSendLength">
+   <widget class="QPushButton" name="btnSendCMD">
     <property name="geometry">
      <rect>
-      <x>450</x>
-      <y>720</y>
+      <x>250</x>
+      <y>750</y>
       <width>201</width>
       <height>31</height>
      </rect>
     </property>
     <property name="text">
-     <string>Send Length</string>
+     <string>Send Command</string>
     </property>
     <property name="shortcut">
      <string>Return</string>
@@ -1358,8 +1358,8 @@
    <widget class="QPushButton" name="btnDown">
     <property name="geometry">
      <rect>
-      <x>690</x>
-      <y>720</y>
+      <x>480</x>
+      <y>750</y>
       <width>201</width>
       <height>31</height>
      </rect>
@@ -1371,8 +1371,8 @@
    <widget class="QPushButton" name="btnUp">
     <property name="geometry">
      <rect>
-      <x>910</x>
-      <y>720</y>
+      <x>700</x>
+      <y>750</y>
       <width>201</width>
       <height>31</height>
      </rect>
@@ -1467,13 +1467,32 @@
    <widget class="QWidget" name="gridLayoutWidget_3">
     <property name="geometry">
      <rect>
-      <x>230</x>
-      <y>550</y>
+      <x>30</x>
+      <y>580</y>
       <width>421</width>
-      <height>181</height>
+      <height>171</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout_2">
+     <item row="2" column="1">
+      <widget class="QLineEdit" name="speed_CMD">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
      <item row="0" column="0" colspan="2">
       <widget class="QLabel" name="lblDesiredCableLength">
        <property name="sizePolicy">
@@ -1490,7 +1509,33 @@
        </property>
       </widget>
      </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="lblAmplitude_2">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Length</string>
+       </property>
+      </widget>
+     </item>
      <item row="1" column="1">
+      <widget class="QLabel" name="lblSpeed_2">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Speed</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
       <widget class="QLineEdit" name="length_CMD">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -1509,22 +1554,15 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="lblLength">
-       <property name="text">
-        <string>Length:</string>
-       </property>
-      </widget>
-     </item>
     </layout>
    </widget>
    <widget class="QWidget" name="gridLayoutWidget_5">
     <property name="geometry">
      <rect>
-      <x>690</x>
-      <y>550</y>
+      <x>480</x>
+      <y>580</y>
       <width>421</width>
-      <height>181</height>
+      <height>191</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout_4">
@@ -1571,6 +1609,124 @@
       </widget>
      </item>
     </layout>
+   </widget>
+   <widget class="QWidget" name="gridLayoutWidget_6">
+    <property name="geometry">
+     <rect>
+      <x>930</x>
+      <y>580</y>
+      <width>371</width>
+      <height>171</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="gridLayout_5">
+     <item row="1" column="1">
+      <widget class="QLabel" name="lblSpeed">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Speed</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0" colspan="2">
+      <widget class="QLabel" name="lblTesting">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Testing (Sin Wave)</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLineEdit" name="test_speed_CMD">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="lblAmplitude">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Amplitude</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLineEdit" name="test_amp_CMD">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QPushButton" name="btnStartTest">
+    <property name="geometry">
+     <rect>
+      <x>930</x>
+      <y>750</y>
+      <width>181</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Start</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnStopTest">
+    <property name="geometry">
+     <rect>
+      <x>1120</x>
+      <y>750</y>
+      <width>181</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Stop</string>
+    </property>
    </widget>
   </widget>
   <widget class="QWidget" name="ManualFlightManagment_Tab">
