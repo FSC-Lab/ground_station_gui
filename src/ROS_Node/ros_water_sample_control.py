@@ -40,7 +40,7 @@ class WaterSampleRosNode(QObject):
         cmd_msg.data = [len, spd]
         self.cmd_stepper_pub.publish(cmd_msg)
 
-    def pub_stepper_cmd(self, amplitude, speed, startCMD):
+    def pub_stepper_test(self, amplitude, speed, startCMD):
         test_msg = Float32MultiArray()
         if startCMD:
             test_msg.data = [1, amplitude, speed]
@@ -99,9 +99,9 @@ class WaterSampleRosThread():
         self.ui.rawY_DISP.display(int(self.raw_pos_msg.y))
         self.ui.rawZ_DISP.display(int(self.raw_pos_msg.z))
 
-        self.ui.PayloadX_DISP.display(int(self.payload_pos_msg.x))
-        self.ui.PayloadY_DISP.display(int(self.payload_pos_msg.y))
-        self.ui.PayloadZ_DISP.display(int(self.payload_pos_msg.z))
+        self.ui.PayloadX_DISP.display(float(self.payload_pos_msg.x))
+        self.ui.PayloadY_DISP.display(float(self.payload_pos_msg.y))
+        self.ui.PayloadZ_DISP.display(float(self.payload_pos_msg.z))
 
     def send_cable_cmd_req(self):
         self.ros_object.pub_stepper_cmd(float(self.ui.length_CMD.text()), float(self.ui.speed_CMD.text()))

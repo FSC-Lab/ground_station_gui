@@ -1158,13 +1158,34 @@
      <item>
       <layout class="QHBoxLayout" name="GPS_DISP_8">
        <item>
-        <widget class="QLCDNumber" name="PayloadX_DISP"/>
+        <widget class="QLCDNumber" name="PayloadX_DISP">
+         <property name="smallDecimalPoint">
+          <bool>false</bool>
+         </property>
+         <property name="digitCount">
+          <number>5</number>
+         </property>
+        </widget>
        </item>
        <item>
-        <widget class="QLCDNumber" name="PayloadY_DISP"/>
+        <widget class="QLCDNumber" name="PayloadY_DISP">
+         <property name="smallDecimalPoint">
+          <bool>false</bool>
+         </property>
+         <property name="digitCount">
+          <number>5</number>
+         </property>
+        </widget>
        </item>
        <item>
-        <widget class="QLCDNumber" name="PayloadZ_DISP"/>
+        <widget class="QLCDNumber" name="PayloadZ_DISP">
+         <property name="smallDecimalPoint">
+          <bool>false</bool>
+         </property>
+         <property name="digitCount">
+          <number>5</number>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>
