@@ -19,7 +19,7 @@ if __name__ == "__main__":
     # init rosTrackingReference
     ros_node.rospy.init_node("GUI_Node_py")
     # start rviz
-    start_rviz("src/GUI/config.rviz")
+    # start_rviz("src/GUI/config.rviz")
     # define the window
     app = QtWidgets.QApplication(sys.argv)
     WaterSamplingGroundControlStation = QtWidgets.QTabWidget()

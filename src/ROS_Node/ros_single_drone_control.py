@@ -157,11 +157,11 @@ class SingleDroneRosThread:
         self.ui.Geofence_X.display(self.ros_object.config[0])
         self.ui.Geofence_Y.display(self.ros_object.config[1])
         self.ui.Geofence_Z.display(self.ros_object.config[2])
-        while self.ros_object.geofence_pub.get_num_connections() < 1:
-            rate = rospy.Rate(1)
-            print("Waiting for Rviz to connect to geofence publisher")
-            rate.sleep()
-        self.ros_object.publish_geofence(int(self.ros_object.config[0]), int(self.ros_object.config[1]), int(self.ros_object.config[2]))
+        # while self.ros_object.geofence_pub.get_num_connections() < 1:
+        #     rate = rospy.Rate(1)
+        #     print("Waiting for Rviz to connect to geofence publisher")
+        #     rate.sleep()
+        # self.ros_object.publish_geofence(int(self.ros_object.config[0]), int(self.ros_object.config[1]), int(self.ros_object.config[2]))
 
 
     def start(self):

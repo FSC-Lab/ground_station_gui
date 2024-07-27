@@ -40,13 +40,16 @@ class WaterSampleRosNode(QObject):
         cmd_msg.data = [len, spd]
         self.cmd_stepper_pub.publish(cmd_msg)
 
-    def pub_stepper_test(self, amplitude, speed, startCMD):
+    def pub_stepper_test(self, amplitude, freq, startCMD):
         test_msg = Float32MultiArray()
         if startCMD:
-            test_msg.data = [1, amplitude, speed]
+            test_msg.data = [1, amplitude, freq]
             self.cable_test_pub.publish(test_msg)
+            print(f"started sine wave test at amp: {amplitude} and freq: {freq}")
             return
-        test_msg.data = [0, amplitude, speed]
+        test_msg.data = [0, amplitude, freq]
+        self.cable_test_pub.publish(test_msg)
+        print("stopped sine testing")
         
     def run(self):
         while not rospy.is_shutdown():
@@ -83,7 +86,7 @@ class WaterSampleRosThread():
         self.ui.btnUp.clicked.connect(self.send_up_incr_request)
         self.ui.btnDown.clicked.connect(self.send_down_incr_request)
         self.ui.btnStartTest.clicked.connect(lambda: self.send_test_request(True))
-        self.ui.btnStopTest.clicked.connect(lambda: self.send_test_request(False))
+        self.ui.btnStopTest.clicked.connect(lambda: self.send_test_request(startCMD=False))
 
 
     def update_gui_data(self, data):
@@ -117,9 +120,9 @@ class WaterSampleRosThread():
         self.ros_object.pub_stepper_cmd(abs_length, 0.5)
 
     def send_stop_request(self):
-        self.ros_object.pub_stepper_cmd(float(self.ui.length_CMD.text()), 0)
+        self.ros_object.pub_stepper_cmd(float(self.ui.PayloadZ_DISP.value()), 0)
 
     ## testing
     def send_test_request(self, startCMD=True):
         self.send_stop_request()
-        self.ros_object.pub_stepper_cmd(float(self.ui.test_amp_CMD.text()), float(self.ui.test_speed_CMD.text()), startCMD)
+        self.ros_object.pub_stepper_test(float(self.ui.test_amp_CMD.text()), float(self.ui.test_frequency_CMD.text()), startCMD)
