@@ -46,7 +46,7 @@ class WaterSampleRosNode(QObject):
         self.cmd_stepper_pub = rospy.Publisher("/stepper/setpoint", Float32MultiArray, queue_size=1)
         self.cable_test_pub = rospy.Publisher("/stepper/test", Float32MultiArray, queue_size=1)
 
-        self.rate = rospy.Rate(5)
+        self.rate = rospy.Rate(10)
 
     ### signal connections to GUI ###
     def connect_update_gui(self, callback):
@@ -122,8 +122,8 @@ class WaterSampleRosThread():
         self.lock.unlock()
 
         # display without decimal
-        self.ui.rawX_DISP.display(int(self.raw_pos_msg.x))
-        self.ui.rawY_DISP.display(int(self.raw_pos_msg.y))
+        self.ui.rawX_DISP.display(float(self.raw_pos_msg.x))
+        self.ui.rawY_DISP.display(float(self.raw_pos_msg.y))
         self.ui.rawZ_DISP.display(int(self.raw_pos_msg.z))
 
         self.ui.PayloadX_DISP.display(float(self.payload_pos_msg.x))

@@ -218,9 +218,9 @@ class SingleDroneRosThread:
             print("SingleDroneRosThread: lock failed")
             return
         # store to local variables for fast lock release
-        imu_msg = self.ros_object.data_struct.current_imu
-        global_pos_msg = self.ros_object.data_struct.current_global_pos
-        local_pos_msg = self.ros_object.data_struct.current_local_pos
+        self.imu_msg = self.ros_object.data_struct.current_imu
+        self.global_pos_msg = self.ros_object.data_struct.current_global_pos
+        self.local_pos_msg = self.ros_object.data_struct.current_local_pos
         vel_msg = self.ros_object.data_struct.current_vel
         bat_msg = self.ros_object.data_struct.current_battery_status
         state_msg = self.ros_object.data_struct.current_state
@@ -229,9 +229,9 @@ class SingleDroneRosThread:
         self.lock.unlock()
 
         # accelerometer data
-        self.ui.X_DISP.display("{:.2f}".format(imu_msg.roll, 2))
-        self.ui.Y_DISP.display("{:.2f}".format(imu_msg.pitch, 2))
-        self.ui.Z_DISP.display("{:.2f}".format(imu_msg.yaw, 2))
+        self.ui.X_DISP.display("{:.2f}".format(self.imu_msg.roll, 2))
+        self.ui.Y_DISP.display("{:.2f}".format(self.imu_msg.pitch, 2))
+        self.ui.Z_DISP.display("{:.2f}".format(self.imu_msg.yaw, 2))
 
         self.ui.TargROLL_DISP.display("{:.2f}".format(alttitude_targ_msg.roll, 2))
         self.ui.TargPITCH_DISP.display("{:.2f}".format(alttitude_targ_msg.pitch, 2))
@@ -239,12 +239,12 @@ class SingleDroneRosThread:
         self.ui.TargTHRUST_DISP.display("{:.2f}".format(alttitude_targ_msg.thrust, 2))
 
         # global & local position data
-        self.ui.LatGPS_DISP.display("{:.2f}".format(global_pos_msg.latitude, 2))
-        self.ui.LongGPS_DISP.display("{:.2f}".format(global_pos_msg.longitude, 2))
-        self.ui.AltGPS_DISP.display("{:.2f}".format(global_pos_msg.altitude, 2))
-        self.ui.RelX_DISP.display("{:.2f}".format(local_pos_msg.x, 2))
-        self.ui.RelY_DISP.display("{:.2f}".format(local_pos_msg.y, 2))
-        self.ui.AGL_DISP.display("{:.2f}".format(local_pos_msg.z, 2))
+        self.ui.LatGPS_DISP.display("{:.2f}".format(self.global_pos_msg.latitude, 2))
+        self.ui.LongGPS_DISP.display("{:.2f}".format(self.global_pos_msg.longitude, 2))
+        self.ui.AltGPS_DISP.display("{:.2f}".format(self.global_pos_msg.altitude, 2))
+        self.ui.RelX_DISP.display("{:.2f}".format(self.local_pos_msg.x, 2))
+        self.ui.RelY_DISP.display("{:.2f}".format(self.local_pos_msg.y, 2))
+        self.ui.AGL_DISP.display("{:.2f}".format(self.local_pos_msg.z, 2))
 
         # velocity data
         self.ui.U_Vel_DISP.display("{:.2f}".format(vel_msg.x, 2))
@@ -318,9 +318,9 @@ class SingleDroneRosThread:
     def send_set_home_request(self):
         self.ros_object.set_home_override_service()
         home_position = CommandHomeRequest()
-        home_position.latitude = self.ros_object.data_struct.current_global_pos.latitude
-        home_position.longitude = self.ros_object.data_struct.current_global_pos.longitude
-        home_position.altitude = self.ros_object.data_struct.current_global_pos.latitude
+        home_position.latitude = self.global_pos_msg.latitude
+        home_position.longitude = self.global_pos_msg.longitude
+        home_position.altitude = self.global_pos_msg.altitude
         response = self.ros_object.set_home_service(home_position)
         print(response)
 
@@ -355,10 +355,10 @@ class SingleDroneRosThread:
 
     def get_coordinates(self):
         # get current relative position
-        self.ui.XPositionUAV.setText("{:.2f}".format(self.ros_object.data_struct.current_local_pos.x, 2))
-        self.ui.YPositionUAV.setText("{:.2f}".format(self.ros_object.data_struct.current_local_pos.y, 2))
-        self.ui.ZPositionUAV.setText("{:.2f}".format(self.ros_object.data_struct.current_local_pos.z, 2))
-        self.ui.YAWUAV.setText("{:.2f}".format(self.ros_object.data_struct.current_imu.yaw, 2))
+        self.ui.XPositionUAV.setText("{:.2f}".format(self.local_pos_msg.x, 2))
+        self.ui.YPositionUAV.setText("{:.2f}".format(self.local_pos_msg.y, 2))
+        self.ui.ZPositionUAV.setText("{:.2f}".format(self.local_pos_msg.z, 2))
+        self.ui.YAWUAV.setText("{:.2f}".format(self.imu_msg.yaw, 2))
 
     ### define publish / service functions to ros topics ###
     def send_arming_request(self, arm, param2):
