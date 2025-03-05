@@ -34,7 +34,7 @@ from visualization_msgs.msg import Marker
 from std_srvs.srv import Empty
 from nav_msgs.msg import Odometry
 import json
-from fsc_autopilot_ros.msg import TrackingReference
+from fsc_autopilot_msgs.msg import TrackingReference
 from std_msgs.msg import Bool
 
 class SingleDroneRosNode(QObject):
