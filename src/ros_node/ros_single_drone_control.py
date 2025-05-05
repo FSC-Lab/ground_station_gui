@@ -25,7 +25,7 @@ SOFTWARE.
 import rospy
 from PyQt5.QtCore import QObject, pyqtSignal, QThread
 from PyQt5.QtWidgets import QMessageBox
-import Common
+import common
 from sensor_msgs.msg import Imu, NavSatFix, BatteryState
 from geometry_msgs.msg import Point
 from mavros_msgs.srv import CommandHome, CommandHomeRequest, CommandLong, SetMode
@@ -43,7 +43,7 @@ class SingleDroneRosNode(QObject):
 
     def __init__(self):
         super().__init__()
-        self.data_struct = Common.CommonData()
+        self.data_struct = common.CommonData()
         # define subscribers
         self.imu_sub = rospy.Subscriber('mavros/imu/data', Imu, callback=self.imu_sub)
         self.pos_global_sub = rospy.Subscriber('mavros/global_position/global', NavSatFix, callback=self.pos_global_sub)

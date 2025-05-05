@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 '''
 MIT License
 
@@ -21,17 +22,19 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 '''
-#!/usr/bin/env python
-import ROS_Node.ros_common as ros_common
+
+import ros_node.ros_common as ros_common
 from PyQt5.QtCore import QMutex
 from scipy.spatial.transform import Rotation
 
 
-class CommonData(): # store the data from the ROS nodes
+# store the data that are shared between the ros thread and the Qt main thread
+class CommonData():
     def __init__(self):
+        # basic drone information
         self.msg = ""
         self.current_Time = ""
-        
+
         self.current_distance = ""
         self.total_distance = 0
 
@@ -44,15 +47,20 @@ class CommonData(): # store the data from the ROS nodes
         self.current_attitude_target = ros_common.AttitudeTarget()
         self.indoor_mode = False
 
-        # water sampling
-        self.encoder_raw = ros_common.Vector3()
-        self.payload_pos = ros_common.Vector3()
+        # slung payload control
+        # self.encoder_raw = ros_common.Vector3()
+        # self.payload_pos = ros_common.Vector3()
+        self.encoder_info = ros_common.EncoderInfo()
 
-        self.lock = QMutex()
+        self.lock = QMutex()  # this lock is to ensure that no data racing between the ros thread and the Qt main thread
 
+    """
+        all update functions should contain the lock feature to ensure thread safety
+
+    """
     def update_imu(self, x, y, z, w):
         euler = self.quat_to_euler(x, y, z, w)
-    
+
         if not self.lock.tryLock():
             return
         self.current_imu.roll = euler[0]
@@ -60,7 +68,7 @@ class CommonData(): # store the data from the ROS nodes
         self.current_imu.yaw = euler[2]
         self.lock.unlock()
         return
-  
+
     def update_global_pos(self, latitude, longitude, altitude):
         if not self.lock.tryLock():
             return
@@ -78,7 +86,7 @@ class CommonData(): # store the data from the ROS nodes
         self.current_local_pos.z = z
         self.lock.unlock()
         return
-    
+
     def update_vel(self, vx, vy, vz):
         if not self.lock.tryLock():
             return
@@ -87,7 +95,7 @@ class CommonData(): # store the data from the ROS nodes
         self.current_vel.z = vz
         self.lock.unlock()
         return
-    
+
     def update_bat(self, percentage, voltage):
         if not self.lock.tryLock():
             return
@@ -95,7 +103,6 @@ class CommonData(): # store the data from the ROS nodes
         self.current_battery_status.voltage = voltage
         self.lock.unlock()
         return
-    
 
     def update_state(self, connected, armed, manual_input, mode, seconds):
         if not self.lock.tryLock():
@@ -107,7 +114,7 @@ class CommonData(): # store the data from the ROS nodes
         self.current_state.seconds = seconds
         self.lock.unlock()
         return
-    
+
     def update_attitude_target(self, x, y, z, w, thrust):
         euler = self.quat_to_euler(x, y, z, w)
         if not self.lock.tryLock():
@@ -118,7 +125,7 @@ class CommonData(): # store the data from the ROS nodes
         self.current_attitude_target.thrust = thrust
         self.lock.unlock()
         return
-    
+
     def quat_to_euler(self, x, y, z, w):
         nrm = abs(sum(it**2 for it in (x, y, z, w)) - 1.0)
         quat = [0, 0, 0, 1] if nrm > 1e-5 else [x, y, z, w]
@@ -130,37 +137,33 @@ class CommonData(): # store the data from the ROS nodes
             euler[2] = euler[2] + 360
 
         return euler
-    
+
     def update_estimator_type(self, indoor_mode):
         if not self.lock.tryLock():
             return
         self.indoor_mode = indoor_mode
         self.lock.unlock()
         return
-    
-    ## water sampling tab
 
-    def update_encoder_raw(self, x, y, z):
+    # slung payload control
+
+    def update_encoder(self, angleX, angleY, cable_len, angleX_vel, angleY_vel, cable_vel):
         if not self.lock.tryLock():
             return
-        self.encoder_raw.x = x
-        self.encoder_raw.y = y
-        self.encoder_raw.z = z
+        self.encoder_info.angleX = angleX
+        self.encoder_info.angleY = angleY
+        self.encoder_info.cable_len = cable_len
+        self.encoder_info.angleX_vel = angleX_vel
+        self.encoder_info.angleY_vel = angleY_vel
+        self.encoder_info.cable_vel = cable_vel
         self.lock.unlock()
         return
-    
-    def update_payload_pos(self, x, y, z):
-        if not self.lock.tryLock():
-            return
-        self.payload_pos.x = x
-        self.payload_pos.y = y
-        self.payload_pos.z = z
-        self.lock.unlock()
-        return
-        
-    
 
-    
-    
-
-
+    # def update_payload_pos(self, x, y, z):
+    #     if not self.lock.tryLock():
+    #         return
+    #     self.payload_pos.x = x
+    #     self.payload_pos.y = y
+    #     self.payload_pos.z = z
+    #     self.lock.unlock()
+    #     return

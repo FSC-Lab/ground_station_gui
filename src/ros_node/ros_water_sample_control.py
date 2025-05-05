@@ -25,7 +25,7 @@ SOFTWARE.
 import rospy
 from PyQt5.QtCore import QObject, pyqtSignal, QThread
 from PyQt5.QtWidgets import QMessageBox
-import Common
+import common
 
 from geometry_msgs.msg import Vector3Stamped
 from std_msgs.msg import Float32MultiArray
@@ -35,7 +35,7 @@ class WaterSampleRosNode(QObject):
 
     def __init__(self):
         super().__init__()
-        self.data_struct = Common.CommonData()
+        self.data_struct = common.CommonData()
         # define subscribers
         self.encoder_raw_sub = rospy.Subscriber("/encoder/position_raw", Vector3Stamped, self.encoder_raw_callback)
         #self.encoder_raw_vel_sub = rospy.Subscriber("/encoder/speed_raw", Vector3Stamped, self.encoder_raw_spd_callback)

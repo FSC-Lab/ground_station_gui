@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>WaterSamplingGroundControlStation</class>
- <widget class="QTabWidget" name="WaterSamplingGroundControlStation">
+ <class>ground_station</class>
+ <widget class="QTabWidget" name="ground_station">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -10,8 +10,26 @@
     <height>857</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>1338</width>
+    <height>857</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>1338</width>
+    <height>857</height>
+   </size>
+  </property>
   <property name="windowTitle">
-   <string>TabWidget</string>
+   <string>slung payload control ground station</string>
   </property>
   <property name="currentIndex">
    <number>1</number>
@@ -250,9 +268,9 @@
    <widget class="QLabel" name="AutonomousTitle">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>15</y>
-      <width>601</width>
+      <x>140</x>
+      <y>20</y>
+      <width>281</width>
       <height>61</height>
      </rect>
     </property>
@@ -271,7 +289,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>80</y>
+      <y>100</y>
       <width>301</width>
       <height>141</height>
      </rect>
@@ -331,7 +349,7 @@
     <property name="geometry">
      <rect>
       <x>350</x>
-      <y>240</y>
+      <y>260</y>
       <width>291</width>
       <height>141</height>
      </rect>
@@ -395,7 +413,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>240</y>
+      <y>260</y>
       <width>301</width>
       <height>141</height>
      </rect>
@@ -455,7 +473,7 @@
     <property name="geometry">
      <rect>
       <x>660</x>
-      <y>310</y>
+      <y>330</y>
       <width>181</width>
       <height>71</height>
      </rect>
@@ -495,7 +513,7 @@
     <property name="geometry">
      <rect>
       <x>350</x>
-      <y>80</y>
+      <y>100</y>
       <width>291</width>
       <height>141</height>
      </rect>
@@ -555,7 +573,7 @@
     <property name="geometry">
      <rect>
       <x>440</x>
-      <y>410</y>
+      <y>430</y>
       <width>161</width>
       <height>71</height>
      </rect>
@@ -590,7 +608,7 @@
     <property name="geometry">
      <rect>
       <x>660</x>
-      <y>130</y>
+      <y>150</y>
       <width>181</width>
       <height>80</height>
      </rect>
@@ -659,7 +677,7 @@
     <property name="geometry">
      <rect>
       <x>660</x>
-      <y>80</y>
+      <y>100</y>
       <width>181</width>
       <height>41</height>
      </rect>
@@ -689,7 +707,7 @@
     <property name="geometry">
      <rect>
       <x>660</x>
-      <y>220</y>
+      <y>240</y>
       <width>181</width>
       <height>81</height>
      </rect>
@@ -736,7 +754,7 @@
     <property name="geometry">
      <rect>
       <x>110</x>
-      <y>390</y>
+      <y>410</y>
       <width>217</width>
       <height>91</height>
      </rect>
@@ -775,7 +793,7 @@
     <property name="geometry">
      <rect>
       <x>350</x>
-      <y>390</y>
+      <y>410</y>
       <width>71</width>
       <height>91</height>
      </rect>
@@ -1117,35 +1135,19 @@
        <item>
         <layout class="QHBoxLayout" name="GPS_DISP_10">
          <item>
-          <widget class="QLCDNumber" name="rawXDot_DISP"/>
+          <widget class="QLCDNumber" name="angle_vel_x_disp"/>
          </item>
          <item>
-          <widget class="QLCDNumber" name="rawYDot_DISP"/>
+          <widget class="QLCDNumber" name="angle_vel_y_disp"/>
          </item>
          <item>
-          <widget class="QLCDNumber" name="rawZDot_DISP"/>
+          <widget class="QLCDNumber" name="cable_speed_disp"/>
          </item>
         </layout>
        </item>
       </layout>
      </widget>
-     <widget class="QLabel" name="lblRawEncoder">
-      <property name="geometry">
-       <rect>
-        <x>190</x>
-        <y>10</y>
-        <width>171</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Encoder Readings</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignBottom|Qt::AlignHCenter</set>
-      </property>
-     </widget>
-     <widget class="QLabel" name="lblRawEncoder_2">
+     <widget class="QLabel" name="encoder_status">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -1164,7 +1166,7 @@
        <set>Qt::AlignBottom|Qt::AlignHCenter</set>
       </property>
      </widget>
-     <widget class="QLabel" name="lblRawEncoder_3">
+     <widget class="QLabel" name="motor_status_text">
       <property name="geometry">
        <rect>
         <x>20</x>
@@ -1180,23 +1182,36 @@
        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton">
+     <widget class="QPushButton" name="motor_stop_button">
       <property name="geometry">
        <rect>
-        <x>30</x>
+        <x>20</x>
         <y>300</y>
-        <width>91</width>
+        <width>111</width>
         <height>91</height>
        </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton {
+    background-color: #dc3545;  /* blue background */
+    color: black;                /* white text */
+    border-radius: 5px;          /* rounded corners */
+    padding: 5px 10px;
+}
+
+QPushButton:hover {
+    background-color: #2980b9;   /* darker blue on hover */
+}
+</string>
       </property>
       <property name="text">
        <string>Motor Stop</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_2">
+     <widget class="QPushButton" name="manual_mod_button">
       <property name="geometry">
        <rect>
-        <x>30</x>
+        <x>20</x>
         <y>250</y>
         <width>111</width>
         <height>41</height>
@@ -1206,7 +1221,7 @@
        <string>Manual</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_3">
+     <widget class="QPushButton" name="pos_mod_button">
       <property name="geometry">
        <rect>
         <x>150</x>
@@ -1219,7 +1234,7 @@
        <string>Position</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_4">
+     <widget class="QPushButton" name="auto_mod_button">
       <property name="geometry">
        <rect>
         <x>270</x>
@@ -1232,7 +1247,7 @@
        <string>Auto</string>
       </property>
      </widget>
-     <widget class="QLabel" name="lblRawEncoder_4">
+     <widget class="QLabel" name="motor_com_speed_disp">
       <property name="geometry">
        <rect>
         <x>270</x>
@@ -1248,26 +1263,26 @@
        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_5">
+     <widget class="QPushButton" name="cable_up_button">
       <property name="geometry">
        <rect>
-        <x>140</x>
+        <x>150</x>
         <y>300</y>
-        <width>121</width>
-        <height>31</height>
+        <width>111</width>
+        <height>41</height>
        </rect>
       </property>
       <property name="text">
        <string>Up</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_6">
+     <widget class="QPushButton" name="cable_down_button">
       <property name="geometry">
        <rect>
-        <x>140</x>
-        <y>360</y>
-        <width>121</width>
-        <height>31</height>
+        <x>150</x>
+        <y>350</y>
+        <width>111</width>
+        <height>41</height>
        </rect>
       </property>
       <property name="text">
@@ -1447,12 +1462,12 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>Cable Length</string>
+          <string>Command Cable Length</string>
          </property>
         </widget>
        </item>
        <item row="1" column="0">
-        <widget class="QLineEdit" name="length_CMD_2">
+        <widget class="QLineEdit" name="cable_len_cmd">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -1556,7 +1571,7 @@
      </widget>
     </widget>
    </widget>
-   <widget class="QTabWidget" name="tabWidget">
+   <widget class="QTabWidget" name="CommandTab">
     <property name="geometry">
      <rect>
       <x>20</x>
@@ -1565,8 +1580,11 @@
       <height>301</height>
      </rect>
     </property>
+    <property name="accessibleName">
+     <string>Payload Mode</string>
+    </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_3">
      <attribute name="title">
@@ -1678,7 +1696,7 @@
     </widget>
     <widget class="QWidget" name="tab_4">
      <attribute name="title">
-      <string>Payload Auto</string>
+      <string>Payload Mode</string>
      </attribute>
      <widget class="QWidget" name="verticalLayoutWidget_22">
       <property name="geometry">
@@ -1826,6 +1844,14 @@
       </property>
      </widget>
     </widget>
+    <widget class="QWidget" name="WaterSampling">
+     <property name="accessibleName">
+      <string>Water Sampling</string>
+     </property>
+     <attribute name="title">
+      <string>Water Sampling</string>
+     </attribute>
+    </widget>
    </widget>
    <widget class="QPushButton" name="pushButton_8">
     <property name="geometry">
@@ -1853,17 +1879,39 @@
      <string>Controller: Baseline</string>
     </property>
    </widget>
+   <widget class="QLabel" name="label_3">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>10</y>
+      <width>101</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>../images/fsclogo.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
   </widget>
   <widget class="QWidget" name="tab">
+   <property name="accessibleName">
+    <string>auto water sampling</string>
+   </property>
    <attribute name="title">
     <string>Water Sampling</string>
    </attribute>
    <widget class="QLabel" name="titleWaterSampling">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>15</y>
-      <width>481</width>
+      <x>160</x>
+      <y>60</y>
+      <width>331</width>
       <height>61</height>
      </rect>
     </property>
@@ -2316,585 +2364,22 @@
      <string>Stop</string>
     </property>
    </widget>
-  </widget>
-  <widget class="QWidget" name="ManualFlightManagment_Tab">
-   <attribute name="title">
-    <string>Manual Flight</string>
-   </attribute>
-   <widget class="QLabel" name="ManualFlightTitle">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>0</y>
-      <width>321</width>
-      <height>61</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>30</pointsize>
-      <weight>75</weight>
-      <bold>true</bold>
-     </font>
-    </property>
-    <property name="text">
-     <string>Manual Flight</string>
-    </property>
-   </widget>
-   <widget class="QWidget" name="verticalLayoutWidget_8">
-    <property name="geometry">
-     <rect>
-      <x>770</x>
-      <y>10</y>
-      <width>160</width>
-      <height>110</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="FlightTimeVLayout_4">
-     <item>
-      <widget class="QLabel" name="FlightTimeLabel_4">
-       <property name="text">
-        <string>Flight Time</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="FlightTimeHLabel_4">
-       <item>
-        <widget class="QLabel" name="Min_Label_4">
-         <property name="text">
-          <string>Minutes</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="Sec_Label_4">
-         <property name="text">
-          <string>Seconds</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="FlightTime_DISP_4">
-       <item>
-        <widget class="QLCDNumber" name="Min_DISP_4"/>
-       </item>
-       <item>
-        <widget class="QLCDNumber" name="Sec_DISP_4"/>
-       </item>
-      </layout>
-     </item>
-    </layout>
-   </widget>
-   <widget class="QWidget" name="verticalLayoutWidget_9">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>100</y>
-      <width>301</width>
-      <height>181</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="GPSDataLayout_2">
-     <item>
-      <widget class="QLabel" name="GPSLabel_4">
-       <property name="text">
-        <string>GPS</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="GPSHLayout_4">
-       <item>
-        <widget class="QLabel" name="LatLabel_4">
-         <property name="text">
-          <string>Lateral</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="LongLabel_4">
-         <property name="text">
-          <string>Longitudinal</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="AltLabel_4">
-         <property name="text">
-          <string>Altitude</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="GPS_DISP_4">
-       <item>
-        <widget class="QLCDNumber" name="LatGPS_DISP_4"/>
-       </item>
-       <item>
-        <widget class="QLCDNumber" name="LongGPS_DISP_4"/>
-       </item>
-       <item>
-        <widget class="QLCDNumber" name="AltGPS_DISP_4"/>
-       </item>
-      </layout>
-     </item>
-    </layout>
-   </widget>
-   <widget class="QWidget" name="verticalLayoutWidget_10">
-    <property name="geometry">
-     <rect>
-      <x>410</x>
-      <y>10</y>
-      <width>160</width>
-      <height>80</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="BatLayout_2">
-     <item>
-      <widget class="QLabel" name="BatLabel_4">
-       <property name="text">
-        <string>Battery Level</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QProgressBar" name="BatInd_4">
-       <property name="value">
-        <number>24</number>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-   <widget class="QLabel" name="FlightLogTitle_2">
-    <property name="geometry">
-     <rect>
-      <x>740</x>
-      <y>250</y>
-      <width>241</width>
-      <height>51</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>30</pointsize>
-      <weight>75</weight>
-      <bold>true</bold>
-     </font>
-    </property>
-    <property name="text">
-     <string>Flight Log</string>
-    </property>
-   </widget>
-   <widget class="QTextBrowser" name="Logging_2">
-    <property name="geometry">
-     <rect>
-      <x>620</x>
-      <y>300</y>
-      <width>321</width>
-      <height>481</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="GetCurrentPositionUAV_2">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>490</y>
-      <width>141</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Get Current Position</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="GetCurrentPositionPayload_2">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>730</y>
-      <width>141</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Get  Pos. Payload</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="SendPositionPayload_2">
-    <property name="geometry">
-     <rect>
-      <x>170</x>
-      <y>730</y>
-      <width>141</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Send pos. Payload</string>
-    </property>
-   </widget>
-   <widget class="QWidget" name="verticalLayoutWidget_17">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>300</y>
-      <width>301</width>
-      <height>181</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="DesiredFlightLayout_2">
-     <item>
-      <widget class="QLabel" name="DesiredFlightCoordinates_2">
-       <property name="text">
-        <string>Desired Flight Coordinates</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="FlightHLayout_2">
-       <item>
-        <widget class="QLabel" name="XLabel1_2">
-         <property name="text">
-          <string>X</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="YLabel1_2">
-         <property name="text">
-          <string>Y</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="ZLabel1_2">
-         <property name="text">
-          <string>Z</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="WLabel1_2">
-         <property name="text">
-          <string>W</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="FlightHLayout1_2">
-       <item>
-        <widget class="QLineEdit" name="XPositionUAV_2"/>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="YPositionUAV_2"/>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="ZPositionUAV_2"/>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="WPositionUAV_2"/>
-       </item>
-      </layout>
-     </item>
-    </layout>
-   </widget>
-   <widget class="QPushButton" name="SendPositionUAV_2">
-    <property name="geometry">
-     <rect>
-      <x>170</x>
-      <y>490</y>
-      <width>141</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Send New Position</string>
-    </property>
-   </widget>
-   <widget class="QWidget" name="verticalLayoutWidget_11">
-    <property name="geometry">
-     <rect>
-      <x>590</x>
-      <y>10</y>
-      <width>160</width>
-      <height>80</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="FlightDistVLayout_4">
-     <item>
-      <widget class="QLabel" name="FlightDistLabel_4">
-       <property name="text">
-        <string>Flight Distance</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="FlightDistHLayout_4">
-       <item>
-        <widget class="QLCDNumber" name="Meters_DISP_4"/>
-       </item>
-       <item>
-        <widget class="QLabel" name="Meters_Label_4">
-         <property name="text">
-          <string>Meters</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-    </layout>
-   </widget>
-   <widget class="QWidget" name="verticalLayoutWidget_12">
-    <property name="geometry">
-     <rect>
-      <x>330</x>
-      <y>300</y>
-      <width>281</width>
-      <height>181</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="VelVLayout_4">
-     <item>
-      <widget class="QLabel" name="VelLabel_4">
-       <property name="text">
-        <string>Velocity</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="VelHLabel_4">
-       <item>
-        <widget class="QLabel" name="U_VEL_Label_4">
-         <property name="text">
-          <string>U</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="V_VEL_Label_4">
-         <property name="text">
-          <string>V</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="W_VEL_Label_4">
-         <property name="text">
-          <string>W</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="Vel_DISP_4">
-       <item>
-        <widget class="QLCDNumber" name="U_Vel_DISP_4"/>
-       </item>
-       <item>
-        <widget class="QLCDNumber" name="V_Vel_DISP_4"/>
-       </item>
-       <item>
-        <widget class="QLCDNumber" name="W_Vel_DISP_4"/>
-       </item>
-      </layout>
-     </item>
-    </layout>
-   </widget>
-   <widget class="QPushButton" name="EmergencyStop_2">
-    <property name="geometry">
-     <rect>
-      <x>620</x>
-      <y>130</y>
-      <width>311</width>
-      <height>121</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Emergency Stop</string>
-    </property>
-   </widget>
-   <widget class="QWidget" name="verticalLayoutWidget_13">
-    <property name="geometry">
-     <rect>
-      <x>330</x>
-      <y>100</y>
-      <width>281</width>
-      <height>181</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="IMULayout_2">
-     <item>
-      <widget class="QLabel" name="IMULabel_4">
-       <property name="text">
-        <string>IMU</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="IMUHLayout_2">
-       <item>
-        <widget class="QLabel" name="XLabel0_2">
-         <property name="text">
-          <string>X</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="YLabel0_2">
-         <property name="text">
-          <string>Y</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="ZLabel0_2">
-         <property name="text">
-          <string>Z</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="WLabel0_2">
-         <property name="text">
-          <string>W</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="IMU_DISP_2">
-       <item>
-        <widget class="QLCDNumber" name="X_DISP_4"/>
-       </item>
-       <item>
-        <widget class="QLCDNumber" name="Y_DISP_4"/>
-       </item>
-       <item>
-        <widget class="QLCDNumber" name="Z_DISP_4"/>
-       </item>
-       <item>
-        <widget class="QLCDNumber" name="W_DISP_4"/>
-       </item>
-      </layout>
-     </item>
-    </layout>
-   </widget>
-   <widget class="QWidget" name="verticalLayoutWidget_18">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>530</y>
-      <width>301</width>
-      <height>191</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="WaterSamplingLayout_2">
-     <item>
-      <widget class="QLabel" name="DesiredWaterSamplingPayloadCoordinates_2">
-       <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Desired Water Sampling &lt;/p&gt;&lt;p align=&quot;center&quot;&gt;Payload Coordinates&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="WaterHLayout_2">
-       <item>
-        <widget class="QLabel" name="XLabel2_2">
-         <property name="text">
-          <string>X</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="YLabel2_2">
-         <property name="text">
-          <string>Y</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="ZLabel2_2">
-         <property name="text">
-          <string>Z</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="WLabel2_2">
-         <property name="text">
-          <string>W</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="WaterHLayout1_2">
-       <item>
-        <widget class="QLineEdit" name="XPositionPayload_2"/>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="YPositionPayload_2"/>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="ZPositionPayload_2"/>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="WPositionPayload_2"/>
-       </item>
-      </layout>
-     </item>
-    </layout>
-   </widget>
-  </widget>
-  <widget class="QWidget" name="References_Tab">
-   <attribute name="title">
-    <string>References</string>
-   </attribute>
-   <widget class="QLabel" name="ReferencesTitle">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>20</y>
-      <width>151</width>
-      <height>30</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>20</pointsize>
-      <weight>75</weight>
-      <bold>true</bold>
-     </font>
-    </property>
-    <property name="text">
-     <string>References</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="ReferencesInfo">
+   <widget class="QLabel" name="label_4">
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>80</y>
-      <width>491</width>
-      <height>661</height>
+      <y>50</y>
+      <width>111</width>
+      <height>91</height>
      </rect>
     </property>
     <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;[1] https://wiki.ros.org/roscore&lt;/p&gt;&lt;p&gt;[2] https://wiki.ros.org/mavros&lt;/p&gt;&lt;p&gt;[3] https://docs.px4.io/main/en/flight_controller/pixhawk.html&lt;/p&gt;&lt;p&gt;[4] https://docs.px4.io/main/en/flight_modes/offboard.html&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <string/>
     </property>
-    <property name="wordWrap">
+    <property name="pixmap">
+     <pixmap>../images/fsclogo.png</pixmap>
+    </property>
+    <property name="scaledContents">
      <bool>true</bool>
     </property>
    </widget>
