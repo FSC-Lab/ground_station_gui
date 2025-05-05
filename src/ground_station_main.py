@@ -37,16 +37,16 @@ if __name__ == "__main__":
     ros_node.rospy.init_node("GUI_Node_py")
     # define the window
     app = QtWidgets.QApplication(sys.argv)
-    WaterSamplingGroundControlStation = QtWidgets.QTabWidget()
-    ui = gui.Ui_WaterSamplingGroundControlStation()
-    ui.setupUi(WaterSamplingGroundControlStation)
+    ground_station_gui = QtWidgets.QTabWidget()
+    ui = gui.Ui_ground_station()
+    ui.setupUi(ground_station_gui)
     # define ros threads
     rosSingleDroneThread = ros_node.SingleDroneRosThread(ui)
     rosSingleDroneThread.start()
-    rosWaterSampleThread = ros_node.WaterSampleRosThread(ui)
-    rosWaterSampleThread.start()
+    # rosWaterSampleThread = ros_node.WaterSampleRosThread(ui)
+    # rosWaterSampleThread.start()
 
     # show the window
-    WaterSamplingGroundControlStation.show()
-    print("System Started")
+    ground_station_gui.show()
+    print("ground station gui started...")
     sys.exit(app.exec_())
